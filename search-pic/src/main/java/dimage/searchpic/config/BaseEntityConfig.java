@@ -1,4 +1,4 @@
-package dimage.searchpic.common.config;
+package dimage.searchpic.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
