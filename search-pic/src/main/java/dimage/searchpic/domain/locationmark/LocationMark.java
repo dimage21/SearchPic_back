@@ -2,6 +2,8 @@ package dimage.searchpic.domain.locationmark;
 
 import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.member.Member;
+import dimage.searchpic.exception.ErrorInfo;
+import dimage.searchpic.exception.locationmark.AlreadyMarkedException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,11 +45,11 @@ public class LocationMark {
                 .stream()
                 .map(LocationMark::getLocation)
                 .anyMatch(location -> location.coordinatesIsEqual(location, newLocation));
-        if (alreadyExist) {
-            // throw custom error
-        } else {
-            setMember(member);
-        }
+
+        if (alreadyExist)
+            throw new AlreadyMarkedException(ErrorInfo.ALREADY_MARKED_PLACE);
+
+        setMember(member);
     }
 
     public void delete() {

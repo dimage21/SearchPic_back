@@ -4,6 +4,8 @@ import dimage.searchpic.domain.BaseEntity;
 import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.posttag.PostTag;
+import dimage.searchpic.exception.ErrorInfo;
+import dimage.searchpic.exception.post.MaxTagSizeException;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import javax.persistence.*;
@@ -54,9 +56,8 @@ public class Post extends BaseEntity {
     private void setPostTags(List<PostTag> postTags) {
         if (postTags.size() <= MAX_TAG_COUNT)
             this.postTags.addAll(postTags);
-        else {
-            // throw custom error
-        }
+        else
+            throw new MaxTagSizeException(ErrorInfo.MAX_TAG_SIZE_LIMIT);
     }
 
     public void setAuthor(Member author) {

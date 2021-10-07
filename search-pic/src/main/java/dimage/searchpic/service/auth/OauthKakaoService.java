@@ -2,6 +2,9 @@ package dimage.searchpic.service.auth;
 
 import dimage.searchpic.dto.auth.AccessTokenRequest;
 import dimage.searchpic.dto.auth.OauthUserInfoResponse.KakaoInfoResponse;
+import dimage.searchpic.exception.ErrorInfo;
+import dimage.searchpic.exception.auth.OauthInfoAccessException;
+import dimage.searchpic.exception.auth.OauthTokenAccessException;
 import dimage.searchpic.util.ResponseConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,15 +51,13 @@ public class OauthKakaoService implements OauthService {
             return accessToken;
 
         } catch (RestClientException e) {
-            //TODO throw custom error
-            throw new RuntimeException();
+            throw new OauthTokenAccessException(ErrorInfo.OAUTH_GET_TOKEN_FAIL);
         }
     }
 
     @Override
     public UserInfo getUserOauthInfo(String accessToken) {
         log.info("kakao [getUserOauthInfo] is called");
-
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
         headers.add(CONTENT_TYPE,DEFAULT_CHARSET);
@@ -75,8 +76,7 @@ public class OauthKakaoService implements OauthService {
                     .profileUrl(body.getKakaoAccount().getProfile().getImageUrl())
                     .id(body.getId()).build();
         } catch (RestClientException e) {
-            //TODO throw custom error
-            throw new RuntimeException();
+            throw new OauthInfoAccessException(ErrorInfo.OAUTH_GET_INFO_FAIL);
         }
     }
 }
