@@ -8,6 +8,8 @@ import static org.springframework.http.HttpStatus.*;
 @Getter
 @AllArgsConstructor
 public enum ErrorInfo {
+    BAD_TOKEN(BAD_REQUEST,"A001","잘못된 토큰입니다."),
+
     MAX_TAG_SIZE_LIMIT(BAD_REQUEST,"D001","태그는 최대 5개까지 가능합니다."),
     ALREADY_MARKED_PLACE(BAD_REQUEST,"D002","이미 추가된 장소입니다."),
 

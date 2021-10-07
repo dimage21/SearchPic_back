@@ -1,5 +1,6 @@
 package dimage.searchpic.service.auth;
 
+import dimage.searchpic.config.auth.JwtTokenProvider;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.Provider;
 import dimage.searchpic.domain.member.ProviderName;
@@ -17,6 +18,7 @@ import java.util.UUID;
 public class AuthService {
     private final OauthKakaoService kakaoService;
     private final MemberRepository memberRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public String getTokenFromProvider(String code, String provider) {
         OauthService oauthProvider = findServiceByProvider(provider);
@@ -32,13 +34,14 @@ public class AuthService {
     }
 
     @Transactional
-    public Member getMemberByAccessToken(String accessToken, String provider) {
+    public String createToken(String accessToken, String provider) {
         OauthService oauthProvider = findServiceByProvider(provider);
         UserInfo userOauthInfo = oauthProvider.getUserOauthInfo(accessToken);
         log.info("userInfo arrived = {} {} {}", userOauthInfo.getEmail(),userOauthInfo.getId(),userOauthInfo.getProfileUrl());
         Member findMember = memberRepository.findByProviderId(userOauthInfo.getId(), ProviderName.create(provider)).orElse(null);
         Member member = findOrCreateMember(provider, userOauthInfo, findMember);
-        return member;
+        // pk 로 자체 액세스 토큰 생성 후 리턴
+        return jwtTokenProvider.createAccessToken(member.getId().toString());
     }
 
     @Transactional

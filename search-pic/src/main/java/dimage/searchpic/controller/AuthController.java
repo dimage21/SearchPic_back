@@ -1,6 +1,8 @@
 package dimage.searchpic.controller;
 
-import dimage.searchpic.domain.member.Member;
+import dimage.searchpic.dto.auth.TokenResponse;
+import dimage.searchpic.dto.common.CommonInfo;
+import dimage.searchpic.dto.common.CommonResponse;
 import dimage.searchpic.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +23,7 @@ public class AuthController {
         log.info("[AuthController] getCode is called, code = {}", code);
         String token = authService.getTokenFromProvider(code, provider);
 
-        //TODO: Create Token & response Token
-        Member member = authService.getMemberByAccessToken(token, provider);
-
-        return ResponseEntity.ok(null);
+        TokenResponse accessToken = TokenResponse.of(authService.createToken(token, provider));
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.LOGIN_SUCCESS,accessToken));
     }
 }
