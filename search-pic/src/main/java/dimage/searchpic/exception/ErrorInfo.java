@@ -14,7 +14,8 @@ public enum ErrorInfo {
     ALREADY_MARKED_PLACE(BAD_REQUEST,"D002","이미 추가된 장소입니다."),
 
     OAUTH_GET_INFO_FAIL(UNAUTHORIZED,"S001","토큰으로부터 유저 정보를 받아오는데 실패했습니다."),
-    OAUTH_GET_TOKEN_FAIL(UNAUTHORIZED,"S002","토큰을 받아오는데 실패했습니다.");
+    OAUTH_GET_TOKEN_FAIL(UNAUTHORIZED,"S002","토큰을 받아오는데 실패했습니다."),
+    NOT_AUTHORIZED_USER(UNAUTHORIZED,"S003","유효한 액세스 토큰이 필요합니다.");
 
     private final HttpStatus status;
     private final String errorCode;

@@ -2,6 +2,7 @@ package dimage.searchpic.config.auth;
 
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.auth.BadTokenException;
+import dimage.searchpic.exception.auth.UnauthorizedMemberException;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,12 +58,12 @@ public class JwtTokenProvider {
         try {
             getClaimsFromJwtToken(jwtToken);
             return true;
-        }
-        catch (ExpiredJwtException e) { // 토큰이 만료된 경우
+        } catch (ExpiredJwtException e) { // 토큰이 만료된 경우
             return false;
-        }
-        catch (SignatureException | MalformedJwtException | UnsupportedJwtException ex) { // 잘못된 JWT 서명이거나 지원되지 않는 JWT 토큰인 경우
+        } catch (SignatureException | MalformedJwtException | UnsupportedJwtException ex) { // 잘못된 JWT 서명이거나 지원되지 않는 JWT 토큰인 경우
             throw new BadTokenException(ErrorInfo.BAD_TOKEN);
+        } catch (IllegalArgumentException ex) {
+            throw new UnauthorizedMemberException(ErrorInfo.NOT_AUTHORIZED_USER); // 토큰 없는 경우
         }
     }
 }

@@ -12,6 +12,6 @@ public class ErrorResponse {
     private final String message;
 
     public static ErrorResponse of(CustomException ex){
-        return new ErrorResponse(false, ex.getStatus().value(),ex.getErrorCode(),ex.getErrorCode());
+        return new ErrorResponse(false, ex.getStatus().value(),ex.getErrorCode(),ex.getMessage());
     }
 }
