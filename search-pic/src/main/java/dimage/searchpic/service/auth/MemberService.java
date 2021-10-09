@@ -9,35 +9,26 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
-public class AuthService {
-    private final OauthKakaoService kakaoService;
+public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final OauthService oauthService;
 
     public String getTokenFromProvider(String code, String provider) {
-        OauthService oauthProvider = findServiceByProvider(provider);
-        return oauthProvider.requestOauthToken(code);
-    }
-
-    private OauthService findServiceByProvider(String provider) {
-        switch (provider){
-            case "kakao":
-                return kakaoService;
-        }
-        return null;
+        return oauthService.requestOauthToken(code,provider);
     }
 
     @Transactional
     public String createToken(String accessToken, String provider) {
-        OauthService oauthProvider = findServiceByProvider(provider);
-        UserInfo userOauthInfo = oauthProvider.getUserOauthInfo(accessToken);
-        log.info("userInfo arrived = {} {} {}", userOauthInfo.getEmail(),userOauthInfo.getId(),userOauthInfo.getProfileUrl());
+        UserInfo userOauthInfo = oauthService.getOauthInfo(accessToken,provider); // 소셜사에서 멤버 정보를 가지고 온다
+
         Member findMember = memberRepository.findByProviderId(userOauthInfo.getId(), ProviderName.create(provider)).orElse(null);
         Member member = findOrCreateMember(provider, userOauthInfo, findMember);
         // pk 로 자체 액세스 토큰 생성 후 리턴
