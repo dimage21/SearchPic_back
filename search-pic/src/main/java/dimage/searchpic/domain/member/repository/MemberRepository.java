@@ -13,5 +13,6 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     @Query(value = "select m from Member m where m.provider.providerId = :id and m.provider.providerName = :name")
     Optional<Member> findByProviderId(@Param("id") String providerId, @Param("name") ProviderName providerName);
 
-    Optional<Member> findByNickname(String nickname);
+    @Query(value = "select count(m) > 0 from Member m where m.nickname = :nickname")
+    boolean findByNickname(@Param("nickname") String nickname);
 }

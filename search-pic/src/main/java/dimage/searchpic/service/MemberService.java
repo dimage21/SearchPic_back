@@ -71,16 +71,16 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateProfile(NicknameChangeRequest changeRequest, MultipartFile multipartFile, Long memberId) {
+    public void updateProfile(NicknameChangeRequest changeRequest, MultipartFile profileImage, Long memberId) {
         Member member = checkMemberExist(memberId);
 
         // 변경하려는 닉네임이 이미 존재하는 지 체크
-        if (!member.getNickname().equals(changeRequest.getNickname()) && memberRepository.findByNickname(changeRequest.getNickname()).isPresent()) {
+        if (!member.getNickname().equals(changeRequest.getNickname()) && memberRepository.findByNickname(changeRequest.getNickname())) {
             throw new NicknameDuplicateException(ErrorInfo.DUPLICATE_NICKNAME);
         }
 
-        if(multipartFile != null){ // 프로필 사진도 변경하는 경우
-            String storedFilePath = storageService.storeFile(multipartFile, member.getId());
+        if(profileImage != null){ // 프로필 사진도 변경하는 경우
+            String storedFilePath = storageService.storeFile(profileImage, member.getId());
             member.update(changeRequest.getNickname(),storedFilePath);
             return;
         }

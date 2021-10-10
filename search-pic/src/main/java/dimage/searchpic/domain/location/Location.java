@@ -27,7 +27,7 @@ public class Location {
     @OneToMany(mappedBy = "location")
     List<Post> posts = new ArrayList<>();
 
-    private String repImage;
+    private String repImageUrl;
 
     @Builder
     public Location(double x, double y, String dong, String si, String gu,
@@ -40,7 +40,7 @@ public class Location {
         this.address = address;
         this.placeName = placeName;
         this.posts = posts;
-        this.repImage = repImage;
+        this.repImageUrl = repImage;
     }
 
     public boolean coordinatesIsEqual(Location marked, Location cur) {
