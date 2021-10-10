@@ -19,7 +19,7 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true,nullable = false)
+    @Column(unique = true, nullable = false)
     private String nickname;
 
     private String email;
@@ -52,6 +52,10 @@ public class Member extends BaseEntity {
     public void update(String nickname, String newProfileUrlPath) {
         this.nickname = nickname;
         this.profileUrl = newProfileUrlPath;
+    }
+
+    public void update(String nickname) {
+        this.nickname = nickname;
     }
 
     public void addPostCount() {

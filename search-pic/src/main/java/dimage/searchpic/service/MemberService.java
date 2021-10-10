@@ -1,15 +1,23 @@
-package dimage.searchpic.service.auth;
+package dimage.searchpic.service;
 
 import dimage.searchpic.config.auth.JwtTokenProvider;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.Provider;
 import dimage.searchpic.domain.member.ProviderName;
 import dimage.searchpic.domain.member.repository.MemberRepository;
+import dimage.searchpic.dto.member.MemberResponse;
+import dimage.searchpic.dto.member.NicknameChangeRequest;
+import dimage.searchpic.exception.ErrorInfo;
+import dimage.searchpic.exception.member.MemberNotFoundException;
+import dimage.searchpic.exception.member.NicknameDuplicateException;
+import dimage.searchpic.service.auth.OauthService;
+import dimage.searchpic.service.auth.UserInfo;
+import dimage.searchpic.service.storage.StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.multipart.MultipartFile;
 import java.util.UUID;
 
 @Service
@@ -20,6 +28,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final OauthService oauthService;
+    private final StorageService storageService;
 
     public String getTokenFromProvider(String code, String provider) {
         return oauthService.requestOauthToken(code,provider);
@@ -55,5 +64,32 @@ public class MemberService {
         }
         log.info("이미 등록된 사용자 입니다.");
         return findMember;
+    }
+
+    public Member checkMemberExist(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(ErrorInfo.MEMBER_NULL));
+    }
+
+    @Transactional
+    public void updateProfile(NicknameChangeRequest changeRequest, MultipartFile multipartFile, Long memberId) {
+        Member member = checkMemberExist(memberId);
+
+        // 변경하려는 닉네임이 이미 존재하는 지 체크
+        if (!member.getNickname().equals(changeRequest.getNickname()) && memberRepository.findByNickname(changeRequest.getNickname()).isPresent()) {
+            throw new NicknameDuplicateException(ErrorInfo.DUPLICATE_NICKNAME);
+        }
+
+        if(multipartFile != null){ // 프로필 사진도 변경하는 경우
+            String storedFilePath = storageService.storeFile(multipartFile, member.getId());
+            member.update(changeRequest.getNickname(),storedFilePath);
+            return;
+        }
+        // 닉네임만 변경하는 경우
+        member.update(changeRequest.getNickname());
+    }
+
+    public MemberResponse getProfileInfo(Long memberId) {
+        Member member = checkMemberExist(memberId);
+        return MemberResponse.of(member);
     }
 }

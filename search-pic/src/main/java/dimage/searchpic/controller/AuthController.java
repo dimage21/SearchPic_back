@@ -3,7 +3,7 @@ package dimage.searchpic.controller;
 import dimage.searchpic.dto.auth.TokenResponse;
 import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
-import dimage.searchpic.service.auth.MemberService;
+import dimage.searchpic.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

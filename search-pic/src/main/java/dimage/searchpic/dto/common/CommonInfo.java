@@ -8,6 +8,7 @@ import static org.springframework.http.HttpStatus.OK;
 @Getter
 @AllArgsConstructor
 public enum CommonInfo {
+    SUCCESS(OK,"성공"),
     LOGIN_SUCCESS(OK, "로그인 성공");
 
     private final HttpStatus status;

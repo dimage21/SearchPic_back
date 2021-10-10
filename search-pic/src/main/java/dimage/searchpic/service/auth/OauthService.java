@@ -33,7 +33,7 @@ public class OauthService {
     private OauthInfo oauthInfo;
 
     // 토큰 요청
-    String requestOauthToken(String code, String provider){
+    public String requestOauthToken(String code, String provider){
         getSocialInfo(provider); // 각 소셜사에 맞는 OauthInfo 로 설정하기
 
         HttpHeaders headers = new HttpHeaders();
@@ -69,7 +69,7 @@ public class OauthService {
         }
     }
 
-    UserInfo getOauthInfo(String accessToken,String provider) {
+    public UserInfo getOauthInfo(String accessToken,String provider) {
         switch (provider) {
             case "kakao":
                 return getKakaoOauthInfo(accessToken);

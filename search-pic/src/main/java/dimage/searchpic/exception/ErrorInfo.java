@@ -15,7 +15,10 @@ public enum ErrorInfo {
 
     OAUTH_GET_INFO_FAIL(UNAUTHORIZED,"S001","토큰으로부터 유저 정보를 받아오는데 실패했습니다."),
     OAUTH_GET_TOKEN_FAIL(UNAUTHORIZED,"S002","토큰을 받아오는데 실패했습니다."),
-    NOT_AUTHORIZED_USER(UNAUTHORIZED,"S003","유효한 액세스 토큰이 필요합니다.");
+    NOT_AUTHORIZED_USER(UNAUTHORIZED,"S003","유효한 액세스 토큰이 필요합니다."),
+    FILE_UPLOAD_ERROR(INTERNAL_SERVER_ERROR,"S004","파일 업로드 과정에서 에러가 발생했습니다."),
+    MEMBER_NULL(BAD_REQUEST, "S005", "존재하지 않는 사용자입니다."),
+    DUPLICATE_NICKNAME(CONFLICT,"S006","이미 존재하는 닉네임입니다.");
 
     private final HttpStatus status;
     private final String errorCode;
