@@ -3,7 +3,6 @@ package dimage.searchpic.controller;
 import dimage.searchpic.dto.auth.TokenResponse;
 import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
-import dimage.searchpic.dto.member.MemberResponse;
 import dimage.searchpic.service.MemberService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,13 +24,13 @@ public class AuthController {
 
     @ApiOperation(value = "소셜 로그인")
     @ApiResponses({
-            @ApiResponse(code = 200, response = TokenResponse.class,message = "서버에서 생성한 액세스 토큰을 리턴합다.")
+            @ApiResponse(code = 200, response = TokenResponse.class,message = "서버에서 생성한 액세스 토큰을 리턴한다.")
     })
-    @GetMapping(value = "/login/oauth2/code/{provider}")
-    public ResponseEntity<?> getCode(@ApiParam(value = "소셜사에게 받은 코드 값" ,required = true) @RequestParam(value = "code", required = false) String code,
-                                     @ApiParam(value = "소셜사 이름", required = true) @PathVariable String provider) {
-        log.info("[AuthController] getCode is called, code = {}", code);
-        String token = memberService.getTokenFromProvider(code, provider);
+    @GetMapping(value = "/login/{provider}")
+    public ResponseEntity<?> getTokenFromClient(@ApiParam(value = "소셜사에게 받은 액세스 토큰" ,required = true) @RequestParam(value = "token") String token,
+                                                @ApiParam(value = "소셜사 이름",required = true) @PathVariable String provider) {
+        log.info("provider = {}",provider);
+        log.info("token = {}",token);
         TokenResponse accessToken = TokenResponse.of(memberService.createToken(token, provider));
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.LOGIN_SUCCESS,accessToken));
     }

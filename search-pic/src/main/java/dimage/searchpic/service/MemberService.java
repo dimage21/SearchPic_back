@@ -30,14 +30,9 @@ public class MemberService {
     private final OauthService oauthService;
     private final StorageService storageService;
 
-    public String getTokenFromProvider(String code, String provider) {
-        return oauthService.requestOauthToken(code,provider);
-    }
-
     @Transactional
     public String createToken(String accessToken, String provider) {
-        UserInfo userOauthInfo = oauthService.getOauthInfo(accessToken,provider); // 소셜사에서 멤버 정보를 가지고 온다
-
+        UserInfo userOauthInfo = oauthService.getOauthInfo(accessToken, provider); // 소셜사에서 멤버 정보를 가지고 온다
         Member findMember = memberRepository.findByProviderId(userOauthInfo.getId(), ProviderName.create(provider)).orElse(null);
         Member member = findOrCreateMember(provider, userOauthInfo, findMember);
         // pk 로 자체 액세스 토큰 생성 후 리턴

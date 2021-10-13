@@ -23,57 +23,18 @@ import org.springframework.web.client.RestTemplate;
 public class OauthService {
     static final String DEFAULT_CHARSET = "application/x-www-form-urlencoded;charset=utf-8";
     static final String CONTENT_TYPE = "Content-type";
-    static final String ACCESS_TOKEN = "access_token";
-
     private final RestTemplate restTemplate;
-    private final ResponseConverter responseConverter;
     private final KakaoInfo kaKaoInfo;
     private final NaverInfo naverInfo;
-
     private OauthInfo oauthInfo;
 
-    // 토큰 요청
-    public String requestOauthToken(String code, String provider){
-        getSocialInfo(provider); // 각 소셜사에 맞는 OauthInfo 로 설정하기
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(CONTENT_TYPE, DEFAULT_CHARSET);
-        AccessTokenRequest tokenRequest = oauthInfo.getRequest(code);
-
-        try {
-            ResponseEntity<String> response = restTemplate.exchange(
-                    oauthInfo.getTokenUrl(),
-                    HttpMethod.POST,
-                    new HttpEntity<>(
-                            responseConverter.convertToParams(tokenRequest), //body
-                            headers // header
-                    ),
-                    String.class //responseType
-            );
-
-            return responseConverter.extractFieldValueFromJsonString(response.getBody(), ACCESS_TOKEN);
-
-        } catch (RestClientException e) {
-            throw new OauthTokenAccessException(ErrorInfo.OAUTH_GET_TOKEN_FAIL);
-        }
-    }
-
-    private void getSocialInfo(String provider) {
+    public UserInfo getOauthInfo(String accessToken, String provider) {
         switch (provider) {
             case "kakao":
                 oauthInfo = kaKaoInfo;
-                break;
-            case "naver":
-                oauthInfo = naverInfo;
-                break;
-        }
-    }
-
-    public UserInfo getOauthInfo(String accessToken,String provider) {
-        switch (provider) {
-            case "kakao":
                 return getKakaoOauthInfo(accessToken);
             case "naver":
+                oauthInfo = naverInfo;
                 return getNaverOauthInfo(accessToken);
         }
         return null;
@@ -116,7 +77,6 @@ public class OauthService {
                     new HttpEntity<>(headers),
                     NaverUserInfoResponse.class
             );
-
             NaverUserInfoResponse body = response.getBody();
             return UserInfo.builder()
                     .email(body.getResponse().getEmail())
