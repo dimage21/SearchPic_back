@@ -18,7 +18,8 @@ public enum ErrorInfo {
     NOT_AUTHORIZED_USER(UNAUTHORIZED,"S003","유효한 액세스 토큰이 필요합니다."),
     FILE_UPLOAD_ERROR(INTERNAL_SERVER_ERROR,"S004","파일 업로드 과정에서 에러가 발생했습니다."),
     MEMBER_NULL(BAD_REQUEST, "S005", "존재하지 않는 사용자입니다."),
-    DUPLICATE_NICKNAME(CONFLICT,"S006","이미 존재하는 닉네임입니다.");
+    DUPLICATE_NICKNAME(CONFLICT,"S006","이미 존재하는 닉네임입니다."),
+    UNSUPPORTED_OAUTH(BAD_REQUEST,"S007","지원하지 않는 소셜 네트워크 서비스사입니다.");
 
     private final HttpStatus status;
     private final String errorCode;

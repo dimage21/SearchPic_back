@@ -1,9 +1,9 @@
 package dimage.searchpic.service.auth;
 
-import dimage.searchpic.dto.auth.AccessTokenRequest;
+import dimage.searchpic.domain.member.ProviderName;
+import org.springframework.web.client.RestTemplate;
 
 public interface OauthInfo {
-    AccessTokenRequest getRequest(String code);
-    String getTokenUrl();
-    String getInfoUrl();
+    UserInfo getUserInfo(String accessToken, RestTemplate restTemplate);
+    boolean isProvider(ProviderName provider);
 }
