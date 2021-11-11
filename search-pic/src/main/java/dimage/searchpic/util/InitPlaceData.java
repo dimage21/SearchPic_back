@@ -29,15 +29,14 @@ public class InitPlaceData {
     private final ExcelUtil excelUtil;
 
     @PostConstruct
-    public void saveData() throws IOException{
-        File file = new File(baseDir+"place.xlsx");
-        InputStream fileInputStream = new FileInputStream(file);
-        List<Location> locations = excelUtil.getLocations(fileInputStream, 1, 8);
-        for (Location location : locations) {
-            initService.saveLocation(location);
-        }
+    public void saveData(){
+        try (InputStream fileInputStream = new FileInputStream(baseDir + "place.xlsx")) {
+            List<Location> locations = excelUtil.getLocations(fileInputStream, 1, 8);
+            for (Location location : locations) {
+                initService.saveLocation(location);
+            }
+        } catch (IOException e){e.printStackTrace();}
     }
-
     @Component
     static class InitService {
         @Autowired private EntityManager em;
