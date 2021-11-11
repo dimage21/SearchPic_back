@@ -36,6 +36,8 @@ dependencies {
 	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '2.9.2'
 
 	implementation 'org.apache.poi:poi-ooxml:4.1.2' //xlsx
+
+	implementation 'org.springframework.boot:spring-boot-starter-aop' // aop
 }
 
 test {
