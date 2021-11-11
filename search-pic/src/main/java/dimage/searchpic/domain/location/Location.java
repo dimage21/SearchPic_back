@@ -15,13 +15,12 @@ public class Location {
     @Column(name = "location_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private double x;
     private double y;
-    private String dong;
-    private String si;
-    private String gu;
     private String address;
+    private String si;
+    private String dong;
+    private String gu;
     private String placeName;
 
     @OneToMany(mappedBy = "location")
@@ -30,8 +29,8 @@ public class Location {
     private String repImageUrl;
 
     @Builder
-    public Location(double x, double y, String dong, String si, String gu,
-                    String address,String placeName, List<Post> posts,String repImage) {
+    public Location(double x, double y, String address, String si, String dong, String gu,
+                    String placeName, List<Post> posts, String repImage) {
         this.x = x;
         this.y = y;
         this.dong = dong;
