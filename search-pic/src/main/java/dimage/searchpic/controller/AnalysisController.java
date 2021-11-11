@@ -39,7 +39,7 @@ public class AnalysisController {
     @ApiResponses({
             @ApiResponse(code = 200, message = "TOP3 장소를 반환한다", response = AnalysisLocationResponse.class)
     })
-    @PostMapping(value = "/search-place")
+    @PostMapping(value = "/analysis")
     public ResponseEntity<?> searchPlace(@RequestParam("image")  MultipartFile multipartFile) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
