@@ -1,10 +1,12 @@
 package dimage.searchpic.domain.member;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dimage.searchpic.domain.BaseEntity;
 import dimage.searchpic.domain.locationmark.LocationMark;
 import dimage.searchpic.domain.post.Post;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
+@DynamicUpdate
 public class Member extends BaseEntity {
     @Id
     @Column(name = "member_id")
@@ -33,10 +36,12 @@ public class Member extends BaseEntity {
     private Provider provider;
 
     // 마크한 장소
+    @JsonIgnore
     @OneToMany(mappedBy = "member")
     List<LocationMark> marks = new ArrayList<>();
 
     // 작성한 게시글
+    @JsonIgnore
     @OneToMany(mappedBy = "author")
     List<Post> posts = new ArrayList<>();
 
@@ -60,5 +65,8 @@ public class Member extends BaseEntity {
 
     public void addPostCount() {
         this.postCount++;
+    }
+    public void reducePostCount() {
+        this.postCount--;
     }
 }

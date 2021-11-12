@@ -1,5 +1,6 @@
 package dimage.searchpic.domain.location;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dimage.searchpic.domain.post.Post;
 import lombok.*;
 import javax.persistence.*;
@@ -23,14 +24,15 @@ public class Location {
     private String gu;
     private String placeName;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "location")
-    List<Post> posts = new ArrayList<>();
+    private List<Post> posts = new ArrayList<>();
 
     private String repImageUrl;
 
     @Builder
     public Location(double x, double y, String address, String si, String dong, String gu,
-                    String placeName, List<Post> posts, String repImage) {
+                    String placeName, String repImage) {
         this.x = x;
         this.y = y;
         this.dong = dong;
@@ -38,7 +40,7 @@ public class Location {
         this.gu = gu;
         this.address = address;
         this.placeName = placeName;
-        this.posts = posts;
+        this.posts = new ArrayList<>();
         this.repImageUrl = repImage;
     }
 
@@ -47,5 +49,9 @@ public class Location {
             return true;
         }
         return false;
+    }
+
+    public void setRepImageUrl(String url) {
+        this.repImageUrl = url;
     }
 }

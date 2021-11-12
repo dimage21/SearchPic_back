@@ -1,4 +1,4 @@
-package dimage.searchpic.service.storage;
+package dimage.searchpic.util.storage;
 
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.storage.FileStorageException;
@@ -18,7 +18,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-public class StorageServiceLocal implements StorageService{
+public class FileStorageLocal implements FileStorage {
     @Value("${file.upload-dir}")
     private String baseDir;
 

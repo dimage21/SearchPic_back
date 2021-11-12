@@ -12,7 +12,7 @@ import dimage.searchpic.exception.member.MemberNotFoundException;
 import dimage.searchpic.exception.member.NicknameDuplicateException;
 import dimage.searchpic.service.auth.OauthService;
 import dimage.searchpic.service.auth.UserInfo;
-import dimage.searchpic.service.storage.StorageService;
+import dimage.searchpic.util.storage.FileStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final OauthService oauthService;
-    private final StorageService storageService;
+    private final FileStorage fileStorage;
 
     @Transactional
     public String createToken(String accessToken, String provider) {
@@ -61,13 +61,13 @@ public class MemberService {
         return findMember;
     }
 
-    public Member checkMemberExist(Long memberId) {
+    private Member findMemberById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(ErrorInfo.MEMBER_NULL));
     }
 
     @Transactional
     public void updateProfile(NicknameChangeRequest changeRequest, MultipartFile profileImage, Long memberId) {
-        Member member = checkMemberExist(memberId);
+        Member member = findMemberById(memberId);
 
         // 변경하려는 닉네임이 이미 존재하는 지 체크
         if (!member.getNickname().equals(changeRequest.getNickname()) && memberRepository.findByNickname(changeRequest.getNickname())) {
@@ -75,7 +75,7 @@ public class MemberService {
         }
 
         if(profileImage != null){ // 프로필 사진도 변경하는 경우
-            String storedFilePath = storageService.storeFile(profileImage, member.getId());
+            String storedFilePath = fileStorage.storeFile(profileImage, member.getId());
             member.update(changeRequest.getNickname(),storedFilePath);
             return;
         }
@@ -84,7 +84,7 @@ public class MemberService {
     }
 
     public MemberResponse getProfileInfo(Long memberId) {
-        Member member = checkMemberExist(memberId);
+        Member member = findMemberById(memberId);
         return MemberResponse.of(member);
     }
 }

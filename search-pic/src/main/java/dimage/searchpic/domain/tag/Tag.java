@@ -1,5 +1,6 @@
 package dimage.searchpic.domain.tag;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dimage.searchpic.domain.posttag.PostTag;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,6 +22,7 @@ public class Tag {
     @Column(nullable = false)
     private String name;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "tag")
     private final List<PostTag> postTags = new ArrayList<>();
 

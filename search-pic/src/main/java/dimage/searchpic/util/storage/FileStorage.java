@@ -1,7 +1,7 @@
-package dimage.searchpic.service.storage;
+package dimage.searchpic.util.storage;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public interface StorageService {
+public interface FileStorage {
     String storeFile(MultipartFile file, Long userId);
 }

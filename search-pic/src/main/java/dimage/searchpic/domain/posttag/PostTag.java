@@ -17,11 +17,11 @@ public class PostTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = LAZY,cascade = CascadeType.PERSIST)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne(fetch = LAZY,cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
@@ -35,5 +35,4 @@ public class PostTag {
     public static PostTag create(Post post, Tag tag) {
         return new PostTag(post, tag);
     }
-
 }

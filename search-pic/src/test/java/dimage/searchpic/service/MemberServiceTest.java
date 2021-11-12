@@ -5,7 +5,7 @@ import dimage.searchpic.domain.member.repository.MemberRepository;
 import dimage.searchpic.dto.member.MemberResponse;
 import dimage.searchpic.dto.member.NicknameChangeRequest;
 import dimage.searchpic.exception.member.NicknameDuplicateException;
-import dimage.searchpic.service.storage.StorageService;
+import dimage.searchpic.util.storage.FileStorage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ public class MemberServiceTest {
     private MemberRepository memberRepository;
 
     @Mock
-    private StorageService storageService;
+    private FileStorage fileStorage;
 
     private Member member;
 
@@ -89,7 +89,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         MockMultipartFile file = new MockMultipartFile("file", new byte[100]);
-        when(storageService.storeFile(file, member.getId())).thenReturn(fakeFilePath);
+        when(fileStorage.storeFile(file, member.getId())).thenReturn(fakeFilePath);
         NicknameChangeRequest changeRequest = new NicknameChangeRequest("hi");
 
         //when

@@ -18,7 +18,7 @@ public class LogAspect {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         long start = System.currentTimeMillis();
         try {
-            return joinPoint.proceed(joinPoint.getArgs());
+            return joinPoint.proceed();
         } finally {
             long end = System.currentTimeMillis();
             log.info("method = {}, url = {}, time = {} ms", request.getMethod(), request.getRequestURI(), end-start);

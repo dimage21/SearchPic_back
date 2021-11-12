@@ -1,5 +1,6 @@
 package dimage.searchpic.domain.post;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dimage.searchpic.domain.BaseEntity;
 import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.member.Member;
@@ -40,22 +41,21 @@ public class Post extends BaseEntity {
     @Lob
     private String description;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
-    private final List<PostTag> postTags = new ArrayList<>();
+    private List<PostTag> postTags = new ArrayList<>();
 
-    public Post(Member author, Location location, String pictureUrl, String description,List<PostTag> postTags) {
-        if (postTags != null) {
-            setPostTags(postTags);
-        }
+    @Builder
+    public Post(Member author, Location location, String pictureUrl, String description) {
         this.pictureUrl = pictureUrl;
         this.description = description;
         setAuthor(author);
         setLocation(location);
     }
 
-    private void setPostTags(List<PostTag> postTags) {
+    public void setPostTags(List<PostTag> postTags) {
         if (postTags.size() <= MAX_TAG_COUNT)
-            this.postTags.addAll(postTags);
+            this.postTags = postTags;
         else
             throw new MaxTagSizeException(ErrorInfo.MAX_TAG_SIZE_LIMIT);
     }
@@ -78,6 +78,7 @@ public class Post extends BaseEntity {
 
     public void delete() {
         author.getPosts().remove(this);
+        author.reducePostCount();
         location.getPosts().remove(this);
     }
 }
