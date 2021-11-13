@@ -1,5 +1,7 @@
 package dimage.searchpic.controller;
 
+import dimage.searchpic.config.auth.CurrentMember;
+import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.dto.analysis.AnalysisLocationResponse;
 import dimage.searchpic.dto.analysis.AnalysisResponse;
 import dimage.searchpic.dto.common.CommonInfo;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import springfox.documentation.annotations.ApiIgnore;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +43,8 @@ public class AnalysisController {
             @ApiResponse(code = 200, message = "TOP3 장소를 반환한다", response = AnalysisLocationResponse.class)
     })
     @PostMapping(value = "/analysis")
-    public ResponseEntity<?> searchPlace(@RequestParam("image")  MultipartFile multipartFile) {
+    public ResponseEntity<?> searchPlace(@RequestParam("image")  MultipartFile multipartFile,
+                                         @ApiIgnore @CurrentMember Member member) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
@@ -59,7 +63,7 @@ public class AnalysisController {
 
         AnalysisResponse response = result.getBody();
         ArrayList<String> topList = response.getData();
-        List<AnalysisLocationResponse> results = locationService.findByNames(topList);
+        List<AnalysisLocationResponse> results = locationService.findByNames(topList,member.getId());
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,results));
     }
 }

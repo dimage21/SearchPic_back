@@ -10,7 +10,7 @@ import dimage.searchpic.domain.tag.Tag;
 import dimage.searchpic.dto.post.PostRequest;
 import dimage.searchpic.dto.post.PostResponse;
 import dimage.searchpic.exception.ErrorInfo;
-import dimage.searchpic.exception.member.MemberNotFoundException;
+import dimage.searchpic.exception.common.NotFoundException;
 import dimage.searchpic.exception.post.BadAccessException;
 import dimage.searchpic.util.storage.FileStorage;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ public class PostService {
 
         String url = fileStorage.storeFile(multipartFile, memberId);
         Location location = locationService.findOrCreate(url,x, y);
-        Member author = memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(ErrorInfo.MEMBER_NULL));
+        Member author = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorInfo.MEMBER_NULL));
 
         Post newPost = Post.builder()
                 .author(author)
@@ -62,7 +62,7 @@ public class PostService {
     }
 
     public PostResponse findPost(Long postId, Long memberId) {
-        Post post = postRepository.findOnePostById(postId).orElseThrow(() -> new BadAccessException(ErrorInfo.NOT_ALLOWED_ACCESS));
+        Post post = postRepository.findOnePostById(postId).orElseThrow(() -> new NotFoundException(ErrorInfo.POST_NULL));
         if (!post.getAuthor().getId().equals(memberId)) // 작성자가 글을 조회한 게 아니라면 조회수 1 증가
             post.addView();
         return PostResponse.of(post);

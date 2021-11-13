@@ -31,25 +31,13 @@ public class LocationMark {
     private Member member;
 
     public LocationMark(Location location, Member member) {
-        checkAlreadyMarked(location,member);
+        this.member = member;
         this.location = location;
     }
 
     public void setMember(Member member) {
         this.member = member;
         member.getMarks().add(this);
-    }
-
-    private void checkAlreadyMarked(Location newLocation,Member member) {
-        boolean alreadyExist = member.getMarks()
-                .stream()
-                .map(LocationMark::getLocation)
-                .anyMatch(location -> location.coordinatesIsEqual(location, newLocation));
-
-        if (alreadyExist)
-            throw new AlreadyMarkedException(ErrorInfo.ALREADY_MARKED_PLACE);
-
-        setMember(member);
     }
 
     public void delete() {

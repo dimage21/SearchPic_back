@@ -8,7 +8,7 @@ import dimage.searchpic.domain.member.repository.MemberRepository;
 import dimage.searchpic.dto.member.MemberResponse;
 import dimage.searchpic.dto.member.NicknameChangeRequest;
 import dimage.searchpic.exception.ErrorInfo;
-import dimage.searchpic.exception.member.MemberNotFoundException;
+import dimage.searchpic.exception.common.NotFoundException;
 import dimage.searchpic.exception.member.NicknameDuplicateException;
 import dimage.searchpic.service.auth.OauthService;
 import dimage.searchpic.service.auth.UserInfo;
@@ -62,7 +62,7 @@ public class MemberService {
     }
 
     private Member findMemberById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new MemberNotFoundException(ErrorInfo.MEMBER_NULL));
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorInfo.MEMBER_NULL));
     }
 
     @Transactional

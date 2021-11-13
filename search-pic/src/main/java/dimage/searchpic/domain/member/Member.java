@@ -2,6 +2,7 @@ package dimage.searchpic.domain.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import dimage.searchpic.domain.BaseEntity;
+import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.locationmark.LocationMark;
 import dimage.searchpic.domain.post.Post;
 import lombok.*;
@@ -68,5 +69,12 @@ public class Member extends BaseEntity {
     }
     public void reducePostCount() {
         this.postCount--;
+    }
+
+    public boolean checkAlreadyMarked(Location newLocation) {
+        return this.getMarks()
+                .stream()
+                .map(LocationMark::getLocation)
+                .anyMatch(location -> location.coordinatesIsEqual(location, newLocation));
     }
 }
