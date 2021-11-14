@@ -1,4 +1,4 @@
-package dimage.searchpic.dto.analysis;
+package dimage.searchpic.dto.location;
 
 import dimage.searchpic.domain.location.Location;
 import io.swagger.annotations.ApiModel;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Getter
 @ApiModel("장소 분석 결과 응답")
-public class AnalysisLocationResponse {
+public class LocationResponse {
     @ApiModelProperty("id")
     private Long id;
 
@@ -28,8 +28,8 @@ public class AnalysisLocationResponse {
 
     @ApiModelProperty("스크랩 여부")
     private boolean isMarked; // 이미 해당 장소 스크랩했는지 true false
-    public static AnalysisLocationResponse of(Location location, Boolean isMarked) {
-        return AnalysisLocationResponse.builder()
+    public static LocationResponse of(Location location, Boolean isMarked) {
+        return LocationResponse.builder()
                 .id(location.getId())
                 .address(location.getAddress())
                 .placeName(location.getPlaceName())

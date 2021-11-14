@@ -1,6 +1,7 @@
 package dimage.searchpic.util;
 
 import dimage.searchpic.domain.location.Location;
+import dimage.searchpic.domain.post.Post;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -42,7 +43,7 @@ public class InitPlaceData {
         @Autowired private EntityManager em;
         @Transactional
         public void saveLocation(Location location) {
-            em.persist(location);
+           // em.persist(location);
         }
     }
 
@@ -82,7 +83,7 @@ public class InitPlaceData {
                     }
                     location = new Location(Double.parseDouble(values.get(0)), Double.parseDouble(values.get(1)),
                                             values.get(2), values.get(3), values.get(4),
-                                            values.get(5), values.get(6), null, values.get(7));
+                                            values.get(5), values.get(6), values.get(7));
                     locations.add(location);
                 }
             } catch (Exception e) {

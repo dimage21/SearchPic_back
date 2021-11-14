@@ -1,6 +1,7 @@
 package dimage.searchpic.service;
 
 import dimage.searchpic.domain.location.Location;
+import dimage.searchpic.domain.location.repository.LocationRepository;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.repository.MemberRepository;
 import dimage.searchpic.domain.post.Post;
@@ -14,12 +15,14 @@ import dimage.searchpic.exception.common.NotFoundException;
 import dimage.searchpic.exception.post.BadAccessException;
 import dimage.searchpic.util.storage.FileStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -30,6 +33,7 @@ public class PostService {
     private final FileStorage fileStorage;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final LocationRepository locationRepository;
 
     public PostResponse savePost(MultipartFile multipartFile, PostRequest postRequest, Long memberId, double x, double y) {
         List<Tag> tags = tagService.getTags(postRequest.getTags());
@@ -66,5 +70,15 @@ public class PostService {
         if (!post.getAuthor().getId().equals(memberId)) // 작성자가 글을 조회한 게 아니라면 조회수 1 증가
             post.addView();
         return PostResponse.of(post);
+    }
+
+    public List<PostResponse> getNearSpotsPost(Long locationId, double distance) {
+        Location targetLocation = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
+        List<Location> nearLocations = locationRepository.getNearLocations(targetLocation.getX(), targetLocation.getY(), distance); // distance km 이내에 위치한 장소
+        return nearLocations.stream().filter(
+                location-> location.getPosts().size() > 0
+        )
+        .map(result -> PostResponse.of(result.getPosts().get(0)))
+        .collect(Collectors.toList());
     }
 }

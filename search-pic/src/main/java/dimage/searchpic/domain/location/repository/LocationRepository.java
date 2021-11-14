@@ -12,4 +12,8 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     List<Location> findLocations(@Param("placeNames") List<String> placeNames,@Param("placeString") String placeString);
 
     Optional<Location> findByXAndY(double x, double y);
+
+    String HAVERSINE = "(6371 * acos( sin(radians(:y)) * sin(radians(l.y)) + cos(radians(:y)) * cos(radians(l.y)) * cos(radians(l.x) - radians(:x))) )";
+    @Query("select l from Location l where " + HAVERSINE + " <:distance ORDER BY "+HAVERSINE + " DESC")
+    List<Location> getNearLocations(@Param("x") double x, @Param("y") double y, @Param("distance") double distance);
 }

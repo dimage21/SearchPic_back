@@ -4,7 +4,7 @@ import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.location.repository.LocationRepository;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.repository.MemberRepository;
-import dimage.searchpic.dto.analysis.AnalysisLocationResponse;
+import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.location.CoordResponse;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.common.NotFoundException;
@@ -35,12 +35,18 @@ public class LocationService {
     @Value("${location.key}") private String key;
     @Value("${location.coord-url}") private String requestUrl;
 
-    public List<AnalysisLocationResponse> findByNames(List<String> names, Long memberId) {
+    public List<LocationResponse> findByNames(List<String> names, Long memberId) {
         List<Location> locations = locationRepository.findLocations(names,
                 names.stream().map(Object::toString).collect(Collectors.joining(",")));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorInfo.MEMBER_NULL));
-        return locations.stream().map(location -> AnalysisLocationResponse.of(location, member.checkAlreadyMarked(location)))
+        return locations.stream().map(location -> LocationResponse.of(location, member.checkAlreadyMarked(location)))
                 .collect(Collectors.toList());
+    }
+
+    public LocationResponse findOnePlace(Long locationId,Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorInfo.MEMBER_NULL));
+        Location location = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
+        return LocationResponse.of(location, member.checkAlreadyMarked(location));
     }
 
     public Location requestLocationInfo(double x, double y) {

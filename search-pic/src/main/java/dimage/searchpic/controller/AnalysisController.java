@@ -2,7 +2,7 @@ package dimage.searchpic.controller;
 
 import dimage.searchpic.config.auth.CurrentMember;
 import dimage.searchpic.domain.member.Member;
-import dimage.searchpic.dto.analysis.AnalysisLocationResponse;
+import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.analysis.AnalysisResponse;
 import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
@@ -40,7 +40,7 @@ public class AnalysisController {
 
     @ApiOperation(value = "장소 분석")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "TOP3 장소를 반환한다", response = AnalysisLocationResponse.class)
+            @ApiResponse(code = 200, message = "TOP3 장소를 반환한다", response = LocationResponse.class)
     })
     @PostMapping(value = "/analysis")
     public ResponseEntity<?> searchPlace(@RequestParam("image")  MultipartFile multipartFile,
@@ -63,7 +63,7 @@ public class AnalysisController {
 
         AnalysisResponse response = result.getBody();
         ArrayList<String> topList = response.getData();
-        List<AnalysisLocationResponse> results = locationService.findByNames(topList,member.getId());
+        List<LocationResponse> results = locationService.findByNames(topList,member.getId());
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,results));
     }
 }

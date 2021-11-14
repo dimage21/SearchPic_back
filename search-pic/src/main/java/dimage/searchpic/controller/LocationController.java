@@ -3,6 +3,7 @@ package dimage.searchpic.controller;
 import dimage.searchpic.config.auth.CurrentMember;
 import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.member.Member;
+import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
 import dimage.searchpic.service.LocationMarkService;
@@ -19,7 +20,7 @@ public class LocationController {
     private final LocationService locationService;
     private final LocationMarkService locationMarkService;
 
-    @ApiOperation(value = "장소 정보 확인")
+    @ApiOperation(value = "장소 위치 정보 확인")
     @GetMapping("/location")
     public ResponseEntity<?> checkLocation(@RequestParam double x, @RequestParam double y){
         Location location = locationService.requestLocationInfo(x, y);
@@ -42,5 +43,13 @@ public class LocationController {
                                             @PathVariable("id") long locationId) {
         locationMarkService.unMarkLocation(member.getId(),locationId);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS));
+    }
+
+    @ApiOperation("하나의 장소 관련 정보 조회")
+    @GetMapping("/location/{id}")
+    public ResponseEntity<?> getLocation(@ApiIgnore @CurrentMember Member member,
+                                         @PathVariable("id") long locationId) {
+        LocationResponse response = locationService.findOnePlace(locationId, member.getId());
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
 }

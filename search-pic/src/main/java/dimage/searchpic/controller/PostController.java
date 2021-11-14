@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,6 +53,15 @@ public class PostController {
     @GetMapping("/post/{postId}")
     public ResponseEntity<?> getPost(@ApiIgnore  @CurrentMember Member member, @PathVariable Long postId) {
         PostResponse response = postService.findPost(postId, member.getId());
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
+    }
+
+    @ApiOperation("특정 장소 근처 포토 스팟 글 조회")
+    @GetMapping(value = {"/{locationId}/posts/{distance}", "{locationId}/posts"})
+    public ResponseEntity<?> getNearSpotRepresentInfo(@PathVariable(value = "locationId") Long locationId,
+                                             @PathVariable(value = "distance",required = false) Optional<Double> distanceKm) {
+        double distance = distanceKm.orElse(1.0);
+        List<PostResponse> response = postService.getNearSpotsPost(locationId, distance);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
     }
 }
