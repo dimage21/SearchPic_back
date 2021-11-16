@@ -16,6 +16,7 @@ import dimage.searchpic.exception.post.BadAccessException;
 import dimage.searchpic.util.storage.FileStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -72,9 +73,14 @@ public class PostService {
         return PostResponse.of(post);
     }
 
-    public List<PostResponse> getNearSpotsPost(Long locationId, double distance) {
+    public List<Location> getNearSpotPosts(Long locationId, double distance, PageRequest pageRequest) {
         Location targetLocation = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
-        List<Location> nearLocations = locationRepository.getNearLocations(targetLocation.getX(), targetLocation.getY(), distance); // distance km 이내에 위치한 장소
+        return locationRepository.getNearLocations(targetLocation.getX(), targetLocation.getY(), distance, pageRequest); // distance km 이내에 위치한 장소
+    }
+
+    public List<PostResponse> getNearSpotsPostLimit(Long locationId, double distance) {
+        List<Location> nearLocations = getNearSpotPosts(locationId, distance, PageRequest.of(0, 4));
+
         return nearLocations.stream().filter(
                 location-> location.getPosts().size() > 0
         )

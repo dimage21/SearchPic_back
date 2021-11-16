@@ -4,8 +4,10 @@ import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.location.repository.LocationRepository;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.repository.MemberRepository;
+import dimage.searchpic.domain.posttag.repository.PostTagRepository;
 import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.location.CoordResponse;
+import dimage.searchpic.dto.tag.TagDto;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.common.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +32,9 @@ import java.util.stream.Collectors;
 public class LocationService {
     private final LocationRepository locationRepository;
     private final MemberRepository memberRepository;
+    private final PostTagRepository postTagRepository;
     private final RestTemplate restTemplate;
-
+    
     @Value("${location.key}") private String key;
     @Value("${location.coord-url}") private String requestUrl;
 
@@ -39,14 +42,18 @@ public class LocationService {
         List<Location> locations = locationRepository.findLocations(names,
                 names.stream().map(Object::toString).collect(Collectors.joining(",")));
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorInfo.MEMBER_NULL));
-        return locations.stream().map(location -> LocationResponse.of(location, member.checkAlreadyMarked(location)))
+        return locations.stream().map(location -> LocationResponse.of(location, member.checkAlreadyMarked(location),null))
                 .collect(Collectors.toList());
     }
 
     public LocationResponse findOnePlace(Long locationId,Long memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorInfo.MEMBER_NULL));
         Location location = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
-        return LocationResponse.of(location, member.checkAlreadyMarked(location));
+
+        List<TagDto> topTags = postTagRepository.getTopTags(location.getId(), 3); // top 3 태그
+        List<String> topTagNames = topTags.stream().map(TagDto::getName).collect(Collectors.toList());
+
+        return LocationResponse.of(location, member.checkAlreadyMarked(location),topTagNames);
     }
 
     public Location requestLocationInfo(double x, double y) {

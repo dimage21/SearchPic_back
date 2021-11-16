@@ -61,7 +61,7 @@ public class PostController {
     public ResponseEntity<?> getNearSpotRepresentInfo(@PathVariable(value = "locationId") Long locationId,
                                              @PathVariable(value = "distance",required = false) Optional<Double> distanceKm) {
         double distance = distanceKm.orElse(1.0);
-        List<PostResponse> response = postService.getNearSpotsPost(locationId, distance);
+        List<PostResponse> response = postService.getNearSpotsPostLimit(locationId, distance);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
     }
 }

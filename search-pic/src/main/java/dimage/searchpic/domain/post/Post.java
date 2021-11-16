@@ -9,6 +9,7 @@ import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.post.MaxTagSizeException;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import static javax.persistence.FetchType.LAZY;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
+@DynamicUpdate
 public class Post extends BaseEntity {
     private static final int MAX_TAG_COUNT = 5;
 

@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,13 +28,17 @@ public class PostResponse {
     @ApiModelProperty("글 메모")
     String description;
 
+    @ApiModelProperty("장소 id")
+    long locationId;
+
     public static PostResponse of(Post post) {
         return new PostResponse(
                 post.getId(),
                 post.getPictureUrl(),
                 post.getPostTags().stream().map(postTag -> postTag.getTag().getName()).collect(Collectors.toList()),
                 post.getLocation().getAddress(),
-                post.getDescription()
+                post.getDescription(),
+                post.getLocation().getId()
         );
     }
 }

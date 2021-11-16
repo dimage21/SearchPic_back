@@ -1,6 +1,7 @@
 package dimage.searchpic.domain.location.repository;
 
 import dimage.searchpic.domain.location.Location;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,5 +16,5 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
 
     String HAVERSINE = "(6371 * acos( sin(radians(:y)) * sin(radians(l.y)) + cos(radians(:y)) * cos(radians(l.y)) * cos(radians(l.x) - radians(:x))) )";
     @Query("select l from Location l where " + HAVERSINE + " <:distance ORDER BY "+HAVERSINE + " DESC")
-    List<Location> getNearLocations(@Param("x") double x, @Param("y") double y, @Param("distance") double distance);
+    List<Location> getNearLocations(@Param("x") double x, @Param("y") double y, @Param("distance") double distance, Pageable pageable);
 }
