@@ -10,3 +10,7 @@ spring:
       hibernate.use_sql_comments: true
   profiles:
     include: local,oauth
+
+  data.web.pageable:
+    default-page-size: 24 # 페이징 기본 사이즈 24개로 설정
+    max-page-size: 99 # 최대 99개까지 페이징 요청 가능

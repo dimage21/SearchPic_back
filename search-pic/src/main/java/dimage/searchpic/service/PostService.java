@@ -10,6 +10,7 @@ import dimage.searchpic.domain.posttag.PostTag;
 import dimage.searchpic.domain.tag.Tag;
 import dimage.searchpic.dto.post.PostRequest;
 import dimage.searchpic.dto.post.PostResponse;
+import dimage.searchpic.dto.tag.SearchOrder;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.common.NotFoundException;
 import dimage.searchpic.exception.post.BadAccessException;
@@ -17,6 +18,7 @@ import dimage.searchpic.util.storage.FileStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,5 +88,10 @@ public class PostService {
         )
         .map(result -> PostResponse.of(result.getPosts().get(0)))
         .collect(Collectors.toList());
+    }
+
+    public List<PostResponse> getFilteredPosts(List<String> tags, Pageable pageable, SearchOrder order) {
+        List<Post> filteredPosts = postRepository.getFilteredPosts(tags, pageable.getOffset(), pageable.getPageSize(),order);
+        return filteredPosts.stream().map(PostResponse::of).collect(Collectors.toList());
     }
 }

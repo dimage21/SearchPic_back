@@ -6,11 +6,13 @@ import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
 import dimage.searchpic.dto.post.PostRequest;
 import dimage.searchpic.dto.post.PostResponse;
+import dimage.searchpic.dto.tag.TagSearchRequest;
 import dimage.searchpic.service.PostService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,11 +59,25 @@ public class PostController {
     }
 
     @ApiOperation("특정 장소 근처 포토 스팟 글 조회")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = PostResponse.class, message = "조회 성공")
+    })
     @GetMapping(value = {"/{locationId}/posts/{distance}", "{locationId}/posts"})
     public ResponseEntity<?> getNearSpotRepresentInfo(@PathVariable(value = "locationId") Long locationId,
                                              @PathVariable(value = "distance",required = false) Optional<Double> distanceKm) {
         double distance = distanceKm.orElse(1.0);
         List<PostResponse> response = postService.getNearSpotsPostLimit(locationId, distance);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
+    }
+
+    @ApiOperation("요청한 태그로 필터한 여러 게시글을 반환")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = PostResponse.class, message = "조회 성공")
+    })
+    @GetMapping("/posts/search")
+    public ResponseEntity<?> getPostFilterByTags(@RequestBody @Valid TagSearchRequest tagSearchRequest,
+                                                  final Pageable pageable) {
+        List<PostResponse> response = postService.getFilteredPosts(tagSearchRequest.getTags(), pageable,tagSearchRequest.getOrder());
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
 }

@@ -4,10 +4,10 @@ import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.location.repository.LocationRepository;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.repository.MemberRepository;
-import dimage.searchpic.domain.posttag.repository.PostTagRepository;
+import dimage.searchpic.domain.tag.repository.TagRepository;
 import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.location.CoordResponse;
-import dimage.searchpic.dto.tag.TagDto;
+import dimage.searchpic.dto.tag.TagResponse;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.common.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 public class LocationService {
     private final LocationRepository locationRepository;
     private final MemberRepository memberRepository;
-    private final PostTagRepository postTagRepository;
+    private final TagRepository tagRepository;
     private final RestTemplate restTemplate;
     
     @Value("${location.key}") private String key;
@@ -50,8 +50,8 @@ public class LocationService {
         Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorInfo.MEMBER_NULL));
         Location location = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
 
-        List<TagDto> topTags = postTagRepository.getTopTags(location.getId(), 3); // top 3 태그
-        List<String> topTagNames = topTags.stream().map(TagDto::getName).collect(Collectors.toList());
+        List<TagResponse> topTags = tagRepository.getLocationTopTags(location.getId(), 3); // top 3 태그
+        List<String> topTagNames = topTags.stream().map(TagResponse::getName).collect(Collectors.toList());
 
         return LocationResponse.of(location, member.checkAlreadyMarked(location),topTagNames);
     }
