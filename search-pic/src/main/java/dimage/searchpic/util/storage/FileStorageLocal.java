@@ -4,7 +4,7 @@ import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.storage.FileStorageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
-@Service
+@Component
 public class FileStorageLocal implements FileStorage {
     @Value("${file.upload-dir}")
     private String baseDir;
@@ -36,7 +36,7 @@ public class FileStorageLocal implements FileStorage {
             } catch (IOException e) {
                 log.info("폴더를 생성하는데 실패했습니다.");
             }
-            // 유저 폴더에 해당 파일 저장
+            // 유저 폴더에 해당 파일 저장®
             String imagePath = getFullPath(path,storeFileName);
             file.transferTo(new File(imagePath));
             return  imagePath;

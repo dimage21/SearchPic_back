@@ -49,7 +49,7 @@ public class MemberController {
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, memberResponse));
     }
 
-    @ApiOperation(value = "사용자 프로필 이미지 조회")
+    @ApiOperation(value = "로컬에서 사용자 프로필 이미지 조회")
     @GetMapping(value = "/image", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<Resource> getImage(@ApiParam(value = "프로필 이미지",required = true) @RequestParam(value = "imgurl") String imageUrl) throws MalformedURLException {
         Resource resource = new UrlResource("file:" + imageUrl);
