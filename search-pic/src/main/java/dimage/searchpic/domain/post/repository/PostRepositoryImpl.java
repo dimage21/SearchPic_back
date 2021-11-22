@@ -10,6 +10,7 @@ import dimage.searchpic.dto.tag.SearchOrder;
 import lombok.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import static dimage.searchpic.domain.location.QLocation.location;
 import static dimage.searchpic.domain.post.QPost.post;
@@ -50,11 +51,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         Map<Long, List<PostTagDto>> postTagsMap = findTagsForPosts(getPostIds(postResponses));
 
         postResponses.forEach(p -> {
-            List<String> tagNames = postTagsMap.get(p.getPostId())
-                    .stream()
-                    .map(PostTagDto::getTagName)
-                    .collect(Collectors.toList());
-            p.setTagNames(tagNames);
+            if (postTagsMap.containsKey(p.getPostId())){
+                List<String> tagNames = postTagsMap.get(p.getPostId())
+                        .stream()
+                        .map(PostTagDto::getTagName)
+                        .collect(Collectors.toList());
+                p.setTagNames(tagNames);
+            }
         });
         return postResponses;
     }
