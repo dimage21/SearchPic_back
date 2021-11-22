@@ -94,4 +94,8 @@ public class PostService {
         List<Post> filteredPosts = postRepository.getFilteredPosts(tags, pageable.getOffset(), pageable.getPageSize(),order);
         return filteredPosts.stream().map(PostResponse::of).collect(Collectors.toList());
     }
+
+    public List<PostResponse> getPostsMemberWrite(Long memberId, Pageable pageable) {
+        return postRepository.getPostsMemberWrite(memberId, pageable.getOffset(), pageable.getPageSize());
+    }
 }

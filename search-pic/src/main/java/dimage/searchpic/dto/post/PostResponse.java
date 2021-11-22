@@ -41,4 +41,15 @@ public class PostResponse {
                 post.getLocation().getId()
         );
     }
+
+    public PostResponse(long postId, String pictureUrl, String address, String description, long locationId) {
+        this.postId = postId;
+        this.pictureUrl = pictureUrl;
+        this.address = address;
+        this.description = description;
+        this.locationId = locationId;
+    }
+    public void setTagNames(List<String> tagNames) {
+        this.tagNames = tagNames;
+    }
 }

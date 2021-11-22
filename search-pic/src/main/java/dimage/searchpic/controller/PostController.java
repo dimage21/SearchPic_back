@@ -80,4 +80,15 @@ public class PostController {
         List<PostResponse> response = postService.getFilteredPosts(tagSearchRequest.getTags(), pageable,tagSearchRequest.getOrder());
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
+
+    @ApiOperation("특정 유저가 작성한 여러 게시글을 생성 순으로 반환")
+    @ApiResponses({
+            @ApiResponse(code = 200, response = PostResponse.class, message = "조회 성공")
+    })
+    @GetMapping("/posts/member")
+    public ResponseEntity<?> getPostsByMember(@ApiIgnore @CurrentMember Member member,
+                                              final Pageable pageable) {
+        List<PostResponse> response = postService.getPostsMemberWrite(member.getId(), pageable);
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
+    }
 }
