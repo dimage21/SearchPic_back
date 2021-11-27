@@ -77,7 +77,7 @@ public class PostService {
 
     public List<Location> getNearSpotPosts(Long locationId, double distance, PageRequest pageRequest) {
         Location targetLocation = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
-        return locationRepository.getNearLocations(targetLocation.getX(), targetLocation.getY(), distance, pageRequest); // distance km 이내에 위치한 장소
+        return locationRepository.nearSpotsFromPlace(targetLocation.getX(), targetLocation.getY(), distance, pageRequest.getOffset(),pageRequest.getPageSize()); // distance km 이내에 위치한 장소
     }
 
     public List<PostResponse> getNearSpotsPostLimit(Long locationId, double distance) {
