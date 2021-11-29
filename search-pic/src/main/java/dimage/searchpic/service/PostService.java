@@ -98,4 +98,10 @@ public class PostService {
     public List<PostResponse> getPostsMemberWrite(Long memberId, Pageable pageable) {
         return postRepository.getPostsMemberWrite(memberId, pageable.getOffset(), pageable.getPageSize());
     }
+
+    public List<PostResponse> getPostsOnSpot(Long locationId) {
+        Location location = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
+        return postRepository.findByLocationOrderByCreatedDateDesc(location)
+                .stream().map(PostResponse::of).collect(Collectors.toList());
+    }
 }

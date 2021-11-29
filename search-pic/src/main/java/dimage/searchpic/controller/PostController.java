@@ -91,4 +91,11 @@ public class PostController {
         List<PostResponse> response = postService.getPostsMemberWrite(member.getId(), pageable);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
+
+    @ApiOperation("특정 장소에 등록된 여러 게시글을 생성 순으로 반환")
+    @GetMapping("/posts/{locationId}")
+    public ResponseEntity<?> getPostsByLocation(@PathVariable(value = "locationId") Long locationId){
+        List<PostResponse> response = postService.getPostsOnSpot(locationId);
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
+    }
 }

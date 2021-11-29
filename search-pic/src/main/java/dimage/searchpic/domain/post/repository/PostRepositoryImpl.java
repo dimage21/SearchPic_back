@@ -3,16 +3,18 @@ package dimage.searchpic.domain.post.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import dimage.searchpic.domain.member.QMember;
 import dimage.searchpic.domain.post.Post;
+import dimage.searchpic.dto.location.MarkLocationResponse;
 import dimage.searchpic.dto.post.PostResponse;
 import dimage.searchpic.dto.posttag.PostTagDto;
 import dimage.searchpic.dto.tag.SearchOrder;
 import lombok.*;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import static dimage.searchpic.domain.location.QLocation.location;
+import static dimage.searchpic.domain.member.QMember.member;
 import static dimage.searchpic.domain.post.QPost.post;
 import static dimage.searchpic.domain.posttag.QPostTag.postTag;
 import static dimage.searchpic.domain.tag.QTag.tag;
@@ -100,6 +102,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .orderBy(post.createdDate.desc())
                 .offset(offset)
                 .limit(size)
+                .fetch();
+    }
+
+    @Override
+    public List<MarkLocationResponse> findLocationsMemberWrite(Long memberId) {
+        return queryFactory
+                .select(Projections.fields(MarkLocationResponse.class,
+                        location.id.as("id"),
+                        location.repImageUrl.as("imageUrl"),
+                        location.x.as("x"),
+                        location.y.as("y")
+                ))
+                .from(post)
+                .leftJoin(post.location, location)
+                .leftJoin(post.author, member)
+                .where(member.id.eq(memberId))
                 .fetch();
     }
 }

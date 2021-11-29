@@ -38,6 +38,14 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
                 .fetch();
     }
 
+    @Override
+    public List<Location> nearSpotsFromPosition(double x, double y, double distance) {
+        return getNearSpots(x,y,distance)
+                .orderBy(getHaversineDistance(x, y).asc())
+                .limit(6)
+                .fetch();
+    }
+
     private NumberExpression<Double> getHaversineDistance(double x, double y) {
         return acos(
                     sin(radians(Expressions.constant(y)))

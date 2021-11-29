@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface LocationRepositoryCustom {
     List<Location> nearSpotsFromPlace(double x, double y, double distance, long offset, int size);
+    List<Location> nearSpotsFromPosition(double x, double y, double distance);
 }

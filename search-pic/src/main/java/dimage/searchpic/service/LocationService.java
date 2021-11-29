@@ -2,11 +2,14 @@ package dimage.searchpic.service;
 
 import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.location.repository.LocationRepository;
+import dimage.searchpic.domain.locationmark.repository.LocationMarkRepository;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.repository.MemberRepository;
+import dimage.searchpic.domain.post.repository.PostRepository;
 import dimage.searchpic.domain.tag.repository.TagRepository;
 import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.location.CoordResponse;
+import dimage.searchpic.dto.location.MarkLocationResponse;
 import dimage.searchpic.dto.tag.TagResponse;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.common.NotFoundException;
@@ -31,7 +34,9 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class LocationService {
     private final LocationRepository locationRepository;
+    private final LocationMarkRepository locationMarkRepository;
     private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final RestTemplate restTemplate;
     
@@ -86,5 +91,28 @@ public class LocationService {
                             return location;
                         }
                 );
+    }
+    public List<MarkLocationResponse> findAllLocations(){
+        return locationRepository.findAll().stream().map(MarkLocationResponse::of).collect(Collectors.toList());
+    }
+
+    public List<MarkLocationResponse> findLocationsMemberMarked(Long memberId){
+        return locationMarkRepository.findLocationsMemberMarked(memberId);
+    }
+    public List<MarkLocationResponse> findLocationsMemberWrite(Long memberId){
+        return postRepository.findLocationsMemberWrite(memberId);
+    }
+
+    // distance km 이내에 위치한 포토스팟 6개 조회
+    public List<LocationResponse> nearSpotsInfo(long memberId, double x, double y,double distance) {
+        List<Location> locations = locationRepository.nearSpotsFromPosition(x, y,distance);
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotFoundException(ErrorInfo.MEMBER_NULL));
+
+        return locations.stream().map(location -> {
+            List<TagResponse> topTags = tagRepository.getLocationTopTags(location.getId(), 3); // top 3 태그 조회
+            List<String> topTagNames = topTags.stream().map(TagResponse::getName).collect(Collectors.toList());
+            return LocationResponse.of(location, topTagNames,member.checkAlreadyMarked(location),x,y);
+        })
+        .collect(Collectors.toList());
     }
 }

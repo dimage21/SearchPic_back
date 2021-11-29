@@ -6,6 +6,7 @@ import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
+import dimage.searchpic.dto.location.MarkLocationResponse;
 import dimage.searchpic.service.LocationMarkService;
 import dimage.searchpic.service.LocationService;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,5 +55,36 @@ public class LocationController {
                                          @PathVariable("id") long locationId) {
         LocationResponse response = locationService.findOnePlace(locationId, member.getId());
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
+    }
+
+    @ApiOperation("모든 마커 조회")
+    @GetMapping("/locations/filter")
+    public ResponseEntity<?> getLocations() {
+        List<MarkLocationResponse> response = locationService.findAllLocations();
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
+    }
+
+    @ApiOperation("멤버가 등록한 장소 관련 마커 조회")
+    @GetMapping("/locations/filter/member")
+    public ResponseEntity<?> myUploadLocations(@ApiIgnore @CurrentMember Member member){
+        List<MarkLocationResponse> response = locationService.findLocationsMemberWrite(member.getId());
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
+    }
+
+    @ApiOperation("멤버가 마크한 장소 관련 마커 조회")
+    @GetMapping("/locations/filter/mark")
+    public ResponseEntity<?> myLikeLocations(@ApiIgnore @CurrentMember Member member){
+        List<MarkLocationResponse> response = locationService.findLocationsMemberMarked(member.getId());
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
+    }
+
+    @ApiOperation("현재 위치 근처에 존재하는 장소 정보 조회")
+    @GetMapping(value = {"/locations/{distance}", "/locations"})
+    public ResponseEntity<?> nearSpots(@ApiIgnore @CurrentMember Member member,
+                                       @RequestParam double x, @RequestParam double y,
+                                       @PathVariable(value = "distance",required = false) Optional<Double> distanceKm){
+        double distance = distanceKm.orElse(1.0);
+        List<LocationResponse> response = locationService.nearSpotsInfo(member.getId(),x, y,distance);
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
     }
 }

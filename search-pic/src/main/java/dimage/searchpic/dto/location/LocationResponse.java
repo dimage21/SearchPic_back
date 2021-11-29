@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
+import static dimage.searchpic.util.DistanceUtil.getHaversineDistance;
 
 @Builder
 @NoArgsConstructor
@@ -40,6 +40,9 @@ public class LocationResponse {
     @ApiModelProperty("스크랩 여부")
     private boolean isMarked; // 이미 해당 장소 스크랩했는지 true false
 
+    @ApiModelProperty("거리")
+    private int distance;
+
     public static LocationResponse of(Location location, Boolean isMarked,List<String> repTags) {
         return LocationResponse.builder()
                 .id(location.getId())
@@ -49,6 +52,20 @@ public class LocationResponse {
                 .placeName(location.getPlaceName())
                 .repImageUrl(location.getRepImageUrl())
                 .isMarked(isMarked)
+                .repTags(repTags)
+                .build();
+    }
+
+    public static LocationResponse of(Location location,List<String> repTags, Boolean isMarked, double targetX, double targetY) {
+        return LocationResponse.builder()
+                .id(location.getId())
+                .address(location.getAddress())
+                .x(location.getX())
+                .y(location.getY())
+                .isMarked(isMarked)
+                .placeName(location.getPlaceName())
+                .repImageUrl(location.getRepImageUrl())
+                .distance(getHaversineDistance(location.getX(),location.getY(), targetX, targetY))
                 .repTags(repTags)
                 .build();
     }
