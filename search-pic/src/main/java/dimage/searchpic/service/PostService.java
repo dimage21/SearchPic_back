@@ -68,18 +68,21 @@ public class PostService {
         postRepository.delete(post); // 글과 글에 등록된 태그 모두 같이 삭제
     }
 
-    public PostResponse findPost(Long postId, Long memberId) {
+    // 본인이 조회한 것이 아니라면 조회 수가 1 증가한다.
+    public PostResponse findPostAndUpdateView(Long postId, Long memberId) {
         Post post = postRepository.findOnePostById(postId).orElseThrow(() -> new NotFoundException(ErrorInfo.POST_NULL));
         if (!post.getAuthor().getId().equals(memberId)) // 작성자가 글을 조회한 게 아니라면 조회수 1 증가
             post.addView();
         return PostResponse.of(post);
     }
 
+    @Transactional(readOnly = true)
     public List<Location> getNearSpotPosts(Long locationId, double distance, PageRequest pageRequest) {
         Location targetLocation = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
         return locationRepository.nearSpotsFromPlace(targetLocation.getX(), targetLocation.getY(), distance, pageRequest.getOffset(),pageRequest.getPageSize()); // distance km 이내에 위치한 장소
     }
 
+    @Transactional(readOnly = true)
     public List<PostResponse> getNearSpotsPostLimit(Long locationId, double distance) {
         List<Location> nearLocations = getNearSpotPosts(locationId, distance, PageRequest.of(0, 4));
 
@@ -90,15 +93,18 @@ public class PostService {
         .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<PostResponse> getFilteredPosts(List<String> tags, Pageable pageable, SearchOrder order) {
         List<Post> filteredPosts = postRepository.getFilteredPosts(tags, pageable.getOffset(), pageable.getPageSize(),order);
         return filteredPosts.stream().map(PostResponse::of).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<PostResponse> getPostsMemberWrite(Long memberId, Pageable pageable) {
         return postRepository.getPostsMemberWrite(memberId, pageable.getOffset(), pageable.getPageSize());
     }
 
+    @Transactional(readOnly = true)
     public List<PostResponse> getPostsOnSpot(Long locationId) {
         Location location = locationRepository.findById(locationId).orElseThrow(() -> new NotFoundException(ErrorInfo.LOCATION_NULL));
         return postRepository.findByLocationOrderByCreatedDateDesc(location)

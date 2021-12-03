@@ -54,7 +54,7 @@ public class PostController {
     })
     @GetMapping("/post/{postId}")
     public ResponseEntity<?> getPost(@ApiIgnore  @CurrentMember Member member, @PathVariable Long postId) {
-        PostResponse response = postService.findPost(postId, member.getId());
+        PostResponse response = postService.findPostAndUpdateView(postId, member.getId());
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
     }
 
