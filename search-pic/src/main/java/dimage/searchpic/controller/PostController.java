@@ -6,7 +6,9 @@ import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
 import dimage.searchpic.dto.post.PostRequest;
 import dimage.searchpic.dto.post.PostResponse;
-import dimage.searchpic.dto.tag.TagSearchRequest;
+import dimage.searchpic.dto.tag.SearchOrder;
+import dimage.searchpic.exception.CustomException;
+import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.service.PostService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -75,9 +77,13 @@ public class PostController {
             @ApiResponse(code = 200, response = PostResponse.class, message = "조회 성공")
     })
     @GetMapping("/posts/search")
-    public ResponseEntity<?> getPostFilterByTags(@RequestBody @Valid TagSearchRequest tagSearchRequest,
+    public ResponseEntity<?> getPostsFilterByTags(@RequestParam("tags") List<String> tags,
+                                                  @RequestParam("order") SearchOrder searchOrder,
                                                   final Pageable pageable) {
-        List<PostResponse> response = postService.getFilteredPosts(tagSearchRequest.getTags(), pageable,tagSearchRequest.getOrder());
+        if (tags.size() > 5)
+            throw new CustomException(ErrorInfo.MAX_TAG_SIZE_LIMIT);
+
+        List<PostResponse> response = postService.getFilteredPosts(tags, pageable,searchOrder);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
 
