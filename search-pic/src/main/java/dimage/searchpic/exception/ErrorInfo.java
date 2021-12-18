@@ -13,6 +13,7 @@ public enum ErrorInfo {
     MAX_TAG_SIZE_LIMIT(BAD_REQUEST,"D001","태그는 최대 5개까지 가능합니다."),
     ALREADY_MARKED_PLACE(BAD_REQUEST,"D002","이미 추가된 장소입니다."),
     NOT_MARKED_PLACE(BAD_REQUEST,"D003","추가하지 않은 장소입니다."),
+    MAX_TAG_LENGTH_LIMIT(BAD_REQUEST,"D004","태그는 최대 15자까지 허용됩니다"),
 
     OAUTH_GET_INFO_FAIL(UNAUTHORIZED,"S001","토큰으로부터 유저 정보를 받아오는데 실패했습니다."),
     NOT_AUTHORIZED_USER(UNAUTHORIZED,"S003","유효한 액세스 토큰이 필요합니다."),

@@ -11,6 +11,7 @@ import dimage.searchpic.domain.tag.Tag;
 import dimage.searchpic.dto.post.PostRequest;
 import dimage.searchpic.dto.post.PostResponse;
 import dimage.searchpic.dto.tag.SearchOrder;
+import dimage.searchpic.exception.CustomException;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.common.NotFoundException;
 import dimage.searchpic.exception.post.BadAccessException;
@@ -94,8 +95,10 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostResponse> getFilteredPosts(List<String> tags, Pageable pageable, SearchOrder order) {
-        List<Post> filteredPosts = postRepository.getFilteredPosts(tags, pageable.getOffset(), pageable.getPageSize(),order);
+    public List<PostResponse> getFilteredPosts(List<String> searchTagNames, Pageable pageable, SearchOrder order) {
+        if (searchTagNames.size() > 5)
+            throw new CustomException(ErrorInfo.MAX_TAG_SIZE_LIMIT);
+        List<Post> filteredPosts = postRepository.getFilteredPosts(searchTagNames, pageable.getOffset(), pageable.getPageSize(),order);
         return filteredPosts.stream().map(PostResponse::of).collect(Collectors.toList());
     }
 

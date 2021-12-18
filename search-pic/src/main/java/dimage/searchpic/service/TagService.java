@@ -1,6 +1,7 @@
 package dimage.searchpic.service;
 
 import dimage.searchpic.domain.tag.Tag;
+import dimage.searchpic.domain.tag.Tags;
 import dimage.searchpic.domain.tag.repository.TagRepository;
 import dimage.searchpic.dto.tag.TagDetailResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +17,11 @@ public class TagService {
     private final TagRepository tagRepository;
 
     public List<Tag> getTags(List<String> tagNames) {
-        return tagNames.stream().map(name -> tagRepository.findByName(name)
-                        .orElseGet(() -> tagRepository.save(new Tag(name)))
-        ).collect(Collectors.toList());
+        List<Tag> tagList = tagNames.stream()
+                .map(name -> tagRepository.findByName(name)
+                .orElseGet(() -> tagRepository.save(new Tag(name))))
+                .collect(Collectors.toList());
+        return new Tags(tagList).getTagList();
     }
 
     @Transactional(readOnly = true)

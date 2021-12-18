@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +35,7 @@ public class PostController {
     public ResponseEntity<?> createPost(@ApiIgnore @CurrentMember Member member,
                                         @RequestParam double x, @RequestParam double y,
                                         @RequestPart(value = "image") MultipartFile multipartFile,
-                                        @RequestPart(value = "data") @Valid PostRequest postRequest){
+                                        @RequestPart(value = "data") PostRequest postRequest){
 
         PostResponse response = postService.savePost(multipartFile, postRequest, member.getId(), x, y);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
@@ -80,9 +79,6 @@ public class PostController {
     public ResponseEntity<?> getPostsFilterByTags(@RequestParam("tags") List<String> tags,
                                                   @RequestParam("order") SearchOrder searchOrder,
                                                   final Pageable pageable) {
-        if (tags.size() > 5)
-            throw new CustomException(ErrorInfo.MAX_TAG_SIZE_LIMIT);
-
         List<PostResponse> response = postService.getFilteredPosts(tags, pageable,searchOrder);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
