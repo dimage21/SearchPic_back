@@ -20,8 +20,6 @@ import static javax.persistence.FetchType.LAZY;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @DynamicUpdate
 public class Post extends BaseEntity {
-    private static final int MAX_TAG_COUNT = 5;
-
     @Id
     @Column(name = "post_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,10 +54,7 @@ public class Post extends BaseEntity {
     }
 
     public void setPostTags(List<PostTag> postTags) {
-        if (postTags.size() <= MAX_TAG_COUNT)
-            this.postTags = postTags;
-        else
-            throw new MaxTagSizeException(ErrorInfo.MAX_TAG_SIZE_LIMIT);
+        this.postTags = postTags;
     }
 
     public void setAuthor(Member author) {

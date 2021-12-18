@@ -97,7 +97,7 @@ public class PostService {
     @Transactional(readOnly = true)
     public List<PostResponse> getFilteredPosts(List<String> searchTagNames, Pageable pageable, SearchOrder order) {
         if (searchTagNames.size() > 5)
-            throw new CustomException(ErrorInfo.MAX_TAG_SIZE_LIMIT);
+            throw new CustomException(ErrorInfo.MAX_TAG_COUNT_LIMIT);
         List<Post> filteredPosts = postRepository.getFilteredPosts(searchTagNames, pageable.getOffset(), pageable.getPageSize(),order);
         return filteredPosts.stream().map(PostResponse::of).collect(Collectors.toList());
     }
