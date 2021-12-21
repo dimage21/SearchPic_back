@@ -62,6 +62,17 @@ public class PostService {
         return PostResponse.of(newPost);
     }
 
+    public PostResponse updatePost(PostRequest updateRequest, Long memberId, Long postId) {
+        Post post = postRepository.getPostByAuthorAndId(postId, memberId).orElseThrow(() -> new BadAccessException(ErrorInfo.NOT_ALLOWED_ACCESS));
+        List<Tag> tags = tagService.getTags(updateRequest.getTags());
+
+        List<PostTag> postTags = tags.stream()
+                .map(tag -> new PostTag(post, tag))
+                .collect(Collectors.toList());
+        post.updatePost(postTags,updateRequest.getMemo());
+        return PostResponse.of(post);
+    }
+
     public void deletePost(Long postId, Long memberId) {
         // 해당 멤버가 해당 글을 작성했는지 확인
         Post post = postRepository.getPostByAuthorAndId(postId, memberId).orElseThrow(() -> new BadAccessException(ErrorInfo.NOT_ALLOWED_ACCESS));

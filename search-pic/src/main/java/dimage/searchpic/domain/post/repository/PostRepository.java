@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post,Long>, PostRepositoryCustom {
-    @Query("select p from Post p join fetch p.author a where p.id=:postId and a.id=:memberId")
+    @Query("select p from Post p join fetch p.author a join fetch p.location l where p.id=:postId and a.id=:memberId")
     Optional<Post> getPostByAuthorAndId(@Param("postId") long postId, @Param("memberId") long memberId);
 
     @Query("select p from Post p join fetch p.author join fetch p.location where p.id=:postId")

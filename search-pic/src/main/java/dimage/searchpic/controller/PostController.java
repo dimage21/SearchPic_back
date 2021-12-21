@@ -7,8 +7,6 @@ import dimage.searchpic.dto.common.CommonResponse;
 import dimage.searchpic.dto.post.PostRequest;
 import dimage.searchpic.dto.post.PostResponse;
 import dimage.searchpic.dto.tag.SearchOrder;
-import dimage.searchpic.exception.CustomException;
-import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.service.PostService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -47,6 +45,15 @@ public class PostController {
                                         @PathVariable Long postId) {
         postService.deletePost(postId,member.getId());
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS));
+    }
+
+    @ApiOperation(value = "글 수정")
+    @PatchMapping("/post/{postId}")
+    public ResponseEntity<?> modifyPost(@ApiIgnore @CurrentMember Member member,
+                                        @PathVariable Long postId,
+                                        @RequestBody PostRequest postUpdateRequest) {
+        PostResponse response = postService.updatePost(postUpdateRequest, member.getId(), postId);
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
 
     @ApiOperation(value = "글 조회")

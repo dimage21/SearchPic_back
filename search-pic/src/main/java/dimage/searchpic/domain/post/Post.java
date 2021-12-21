@@ -5,8 +5,6 @@ import dimage.searchpic.domain.BaseEntity;
 import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.posttag.PostTag;
-import dimage.searchpic.exception.ErrorInfo;
-import dimage.searchpic.exception.post.MaxTagSizeException;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
@@ -77,5 +75,13 @@ public class Post extends BaseEntity {
         author.getPosts().remove(this);
         author.reducePostCount();
         location.getPosts().remove(this);
+    }
+
+    public void updatePost(List<PostTag> updateTags, String description) {
+        this.description = description;
+        if (updateTags != null) {
+            this.postTags.clear();
+            this.postTags.addAll(updateTags);
+        }
     }
 }
