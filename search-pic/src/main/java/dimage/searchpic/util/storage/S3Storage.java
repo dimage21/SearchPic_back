@@ -10,6 +10,7 @@ import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.storage.FileStorageException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
@@ -20,7 +21,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
-//@Component
+@Profile("prod")
+@Component
 public class S3Storage implements FileStorage {
     private AmazonS3 s3Client;
 
