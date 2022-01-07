@@ -7,12 +7,14 @@ import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.repository.MemberRepository;
 import dimage.searchpic.domain.post.repository.PostRepository;
 import dimage.searchpic.domain.tag.repository.TagRepository;
+import dimage.searchpic.dto.location.LocationRequest;
 import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.location.CoordResponse;
 import dimage.searchpic.dto.location.MarkLocationResponse;
 import dimage.searchpic.dto.tag.TagResponse;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.common.NotFoundException;
+import dimage.searchpic.util.ResponseConverter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -39,7 +43,8 @@ public class LocationService {
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
     private final RestTemplate restTemplate;
-    
+    private final ResponseConverter responseConverter;
+
     @Value("${location.key}") private String key;
     @Value("${location.coord-url}") private String requestUrl;
 
@@ -62,20 +67,20 @@ public class LocationService {
     }
 
     public Location requestLocationInfo(double x, double y) {
-        String url = UriComponentsBuilder
-                .fromHttpUrl(requestUrl)
-                .queryParam("x", x)
-                .queryParam("y", y)
-                .build().toUriString();
+        LocationRequest locationRequest = new LocationRequest(x, y);
+        URI uri = UriComponentsBuilder.fromHttpUrl(requestUrl)
+                .queryParams(responseConverter.convert(locationRequest))
+                .build()
+                .toUri();
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization",key);
 
-        ResponseEntity<CoordResponse> result = restTemplate.exchange(url,
+        ResponseEntity<CoordResponse> result = restTemplate.exchange(
+                uri,
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
-                CoordResponse.class,
-                x,
-                y
+                CoordResponse.class
         );
         return Objects.requireNonNull(result.getBody()).createLocation(x,y);
     }
