@@ -56,6 +56,15 @@ test {
 	useJUnitPlatform()
 }
 
+processResources.dependsOn('copySecrets')
+
+task copySecrets(type: Copy) {
+	from './security/application-oauth.yml'
+	into './src/main/resources'
+
+	from './security/application-prod.yml'
+	into './src/main/resources'
+}
 
 // querydsl
 def querydslDir = "$buildDir/generated/querydsl"
