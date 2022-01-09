@@ -1,0 +1,4 @@
+[submodule "search-pic/security"]
+	path = search-pic/security
+	url = https://github.com/dimage21/security.git
+	branch = main
