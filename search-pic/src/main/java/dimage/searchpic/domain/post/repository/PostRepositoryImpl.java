@@ -1,10 +1,9 @@
 package dimage.searchpic.domain.post.repository;
 
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import dimage.searchpic.domain.member.QMember;
-import dimage.searchpic.domain.post.Post;
 import dimage.searchpic.dto.location.MarkLocationResponse;
 import dimage.searchpic.dto.post.PostResponse;
 import dimage.searchpic.dto.posttag.PostTagDto;
@@ -24,34 +23,62 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Post> getFilteredPosts(List<String> tagNames, long offset, int size, SearchOrder order) {
-        JPAQuery<Post> postJPAQuery = queryFactory
-                .selectFrom(post)
-                .join(post.location, location).fetchJoin()
+    public List<PostResponse> getFilteredPosts(List<String> tagNames, long offset, int size, SearchOrder order) {
+        JPAQuery<PostResponse> postJPAQuery = queryFactory
+                .select(Projections.constructor(PostResponse.class,
+                        post.id.as("postId"),
+                        post.pictureUrl,
+                        location.address,
+                        post.description,
+                        location.id.as("locationId")
+                        ))
+                .from(post)
+                .join(post.location, location)
                 .join(post.postTags, postTag)
                 .join(postTag.tag, tag)
                 .where(tag.name.in(tagNames))
                 .groupBy(post.id)
-                .having(post.id.count().goe(tagNames.size()))
+                .having(tag.count().goe(tagNames.size()))
                 .offset(offset)
-                .limit(size);
+                .limit(size)
+                .orderBy(sort(order));
 
-        switch (order) {
+        List<PostResponse> postResponses = postJPAQuery.fetch();
+        Map<Long, List<PostTagDto>> tagsForPosts = findTagsForPosts(getPostIds(postResponses));
+        insertTagNamesPerPost(postResponses, tagsForPosts);
+        return postResponses;
+    }
+
+    private OrderSpecifier<?> sort(SearchOrder order) {
+        OrderSpecifier<?> orderCondition = null;
+        switch (order){
             case VIEW:
-                postJPAQuery.orderBy(post.view.desc());
+                orderCondition = post.view.desc();
                 break;
             case RECENT:
-                postJPAQuery.orderBy(post.createdDate.desc());
+                orderCondition = post.createdDate.desc();
+                break;
+            default:
                 break;
         }
-        return postJPAQuery.fetch();
+        return orderCondition;
     }
 
     @Override
     public List<PostResponse> getPostsMemberWrite(Long memberId, long offset, int size) {
         List<PostResponse> postResponses = getPostResponses(memberId, offset, size);
         Map<Long, List<PostTagDto>> postTagsMap = findTagsForPosts(getPostIds(postResponses));
+        insertTagNamesPerPost(postResponses, postTagsMap);
+        return postResponses;
+    }
 
+    private List<Long> getPostIds(List<PostResponse> postResponses) {
+        return postResponses.stream()
+                .map(PostResponse::getPostId)
+                .collect(Collectors.toList());
+    }
+
+    private void insertTagNamesPerPost(List<PostResponse> postResponses, Map<Long, List<PostTagDto>> postTagsMap) {
         postResponses.forEach(p -> {
             if (postTagsMap.containsKey(p.getPostId())){
                 List<String> tagNames = postTagsMap.get(p.getPostId())
@@ -61,13 +88,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 p.setTagNames(tagNames);
             }
         });
-        return postResponses;
-    }
-
-    private List<Long> getPostIds(List<PostResponse> postResponses) {
-        return postResponses.stream()
-                .map(PostResponse::getPostId)
-                .collect(Collectors.toList());
     }
 
     private Map<Long, List<PostTagDto>> findTagsForPosts(List<Long> postIds) {
