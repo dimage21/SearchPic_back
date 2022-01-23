@@ -8,11 +8,15 @@ import lombok.Getter;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-@ApiModel("액세스 토큰 응답")
+@ApiModel("액세스 및 리프레시 토큰 응답")
 public class TokenResponse {
     @ApiModelProperty("액세스 토큰")
     private final String accessToken;
-    public static TokenResponse of(String accessToken) {
-        return new TokenResponse(accessToken);
+
+    @ApiModelProperty("리프레시 토큰")
+    private final String refreshToken;
+
+    public static TokenResponse of(String accessToken, String refreshToken) {
+        return new TokenResponse(accessToken,refreshToken);
     }
 }
