@@ -6,9 +6,7 @@ import dimage.searchpic.domain.member.Provider;
 import dimage.searchpic.domain.member.ProviderName;
 import dimage.searchpic.domain.member.repository.MemberRepository;
 import dimage.searchpic.dto.auth.TokenResponse;
-import dimage.searchpic.exception.ErrorInfo;
-import dimage.searchpic.exception.auth.ExpiredTokenException;
-import dimage.searchpic.service.RedisService;
+import dimage.searchpic.domain.token.repository.RedisTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,7 +20,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisService redisService;
+    private final RedisTokenRepository redisTokenRepository;
     private final MemberRepository memberRepository;
     private final OauthProvider oauthProvider;
 
@@ -31,11 +29,13 @@ public class AuthService {
         UserInfo userOauthInfo = oauthProvider.getUserInfo(socialAccessToken, provider); // 소셜사에서 멤버 정보를 가지고 온다
         Member findMember = memberRepository.findByProviderId(userOauthInfo.getId(), ProviderName.create(provider)).orElse(null);
         Member member = findOrCreateMember(provider, userOauthInfo, findMember);
+
         // pk 로 자체 액세스 토큰 생성 후 리턴
         String accessToken = jwtTokenProvider.createAccessToken(member.getId().toString());
         String refreshToken = jwtTokenProvider.createRefreshToken(member.getId().toString());
+
         // redis 에 refreshToken 정보 저장
-        redisService.setValueWithExpireTime(Long.toString(member.getId()),refreshToken,RefreshTokenInfo.refreshTokenExpireTime);
+        redisTokenRepository.setRefreshTokenWithExpireTime(Long.toString(member.getId()),refreshToken,RefreshTokenInfo.refreshTokenExpireTime);
         return TokenResponse.of(accessToken, refreshToken);
     }
 
@@ -63,27 +63,23 @@ public class AuthService {
 
 
     // 리프레시 토큰 삭제: 만약 가장 최근에 발급한 리프레시 토큰으로 요청하지 않은 경우, 먼료된 토큰이라는 예외를 발생시키고 최근에 발급한 토큰이라면 해당 토큰을 삭제한다.
+    @Transactional
     public void logout(String refreshToken) {
         jwtTokenProvider.isValidToken(refreshToken,"refresh");
         String userId = jwtTokenProvider.getPkFromToken(refreshToken,"refresh");
-        if (!redisService.getValue(userId).equals(refreshToken)) {
-            throw new ExpiredTokenException(ErrorInfo.EXPIRED_TOKEN);
-        }
-        redisService.deleteValue(userId);
+        redisTokenRepository.deleteRefreshToken(userId,refreshToken);
     }
 
     // 리프레시 토큰의 유효성 검사 -> 해당 리프레시 토큰이 유효하면서 가장 최근에 발급한 리프레시 토큰이라면 새로운 액세스 토큰과 새로운 리프레시 토큰을 발급한다.
     @Transactional
     public TokenResponse reissue(String refreshToken) {
-        boolean isValid = jwtTokenProvider.isValidToken(refreshToken,"refresh");
+        jwtTokenProvider.isValidToken(refreshToken,"refresh");
         String userId = jwtTokenProvider.getPkFromToken(refreshToken,"refresh");
+        redisTokenRepository.validIsRecentAndUsableToken(userId, refreshToken);
 
-        if (!isValid || !redisService.getValue(userId).equals(refreshToken)) {
-            throw new ExpiredTokenException(ErrorInfo.EXPIRED_TOKEN);
-        }
         String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
         String newAccessToken = jwtTokenProvider.createAccessToken(userId);
-        redisService.setValueWithExpireTime(userId,newRefreshToken,RefreshTokenInfo.refreshTokenExpireTime);
+        redisTokenRepository.setRefreshTokenWithExpireTime(userId,newRefreshToken,RefreshTokenInfo.refreshTokenExpireTime);
         return TokenResponse.of(newAccessToken,newRefreshToken);
     }
 }
