@@ -25,18 +25,15 @@ public class AuthService {
     private final OauthProvider oauthProvider;
 
     @Transactional
-    public TokenResponse createToken(String socialAccessToken, String provider) {
+    public TokenResponse loginOrSignUpAndCreateTokens(String socialAccessToken, String provider) {
         UserInfo userOauthInfo = oauthProvider.getUserInfo(socialAccessToken, provider); // 소셜사에서 멤버 정보를 가지고 온다
         Member findMember = memberRepository.findByProviderId(userOauthInfo.getId(), ProviderName.create(provider)).orElse(null);
         Member member = findOrCreateMember(provider, userOauthInfo, findMember);
-
         // pk 로 자체 액세스 토큰 생성 후 리턴
-        String accessToken = jwtTokenProvider.createAccessToken(member.getId().toString());
-        String refreshToken = jwtTokenProvider.createRefreshToken(member.getId().toString());
-
+        TokenResponse tokenResponse = jwtTokenProvider.createAccessAndRefreshTokens(member.getId().toString());
         // redis 에 refreshToken 정보 저장
-        redisTokenRepository.setRefreshTokenWithExpireTime(Long.toString(member.getId()),refreshToken,RefreshTokenInfo.refreshTokenExpireTime);
-        return TokenResponse.of(accessToken, refreshToken);
+        redisTokenRepository.setRefreshTokenWithExpireTime(Long.toString(member.getId()),tokenResponse.getRefreshToken(),RefreshTokenInfo.refreshTokenExpireTime);
+        return tokenResponse;
     }
 
     @Transactional
@@ -54,8 +51,7 @@ public class AuthService {
                     .build();
 
             log.info("새로운 사용자 입니다.");
-            memberRepository.save(member);
-            return member;
+            return memberRepository.save(member);
         }
         log.info("이미 등록된 사용자 입니다.");
         return findMember;
@@ -76,10 +72,8 @@ public class AuthService {
         jwtTokenProvider.isValidToken(refreshToken,"refresh");
         String userId = jwtTokenProvider.getPkFromToken(refreshToken,"refresh");
         redisTokenRepository.validIsRecentAndUsableToken(userId, refreshToken);
-
-        String newRefreshToken = jwtTokenProvider.createRefreshToken(userId);
-        String newAccessToken = jwtTokenProvider.createAccessToken(userId);
-        redisTokenRepository.setRefreshTokenWithExpireTime(userId,newRefreshToken,RefreshTokenInfo.refreshTokenExpireTime);
-        return TokenResponse.of(newAccessToken,newRefreshToken);
+        TokenResponse tokenResponse = jwtTokenProvider.createAccessAndRefreshTokens(userId);
+        redisTokenRepository.setRefreshTokenWithExpireTime(userId,tokenResponse.getRefreshToken(),RefreshTokenInfo.refreshTokenExpireTime);
+        return tokenResponse;
     }
 }

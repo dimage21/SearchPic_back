@@ -28,9 +28,7 @@ public class AuthController {
     @GetMapping(value = "/login/{provider}")
     public ResponseEntity<?> getTokenFromClient(@ApiParam(value = "소셜사에게 받은 액세스 토큰" ,required = true) @RequestParam(value = "token") String token,
                                                 @ApiParam(value = "소셜사 이름",required = true) @PathVariable String provider) {
-        log.info("provider = {}",provider);
-        log.info("token = {}",token);
-        TokenResponse response = authService.createToken(token, provider);
+        TokenResponse response = authService.loginOrSignUpAndCreateTokens(token, provider);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.LOGIN_SUCCESS,response));
     }
 

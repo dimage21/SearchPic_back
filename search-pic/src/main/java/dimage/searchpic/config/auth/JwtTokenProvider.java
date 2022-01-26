@@ -1,5 +1,6 @@
 package dimage.searchpic.config.auth;
 
+import dimage.searchpic.dto.auth.TokenResponse;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.auth.BadTokenException;
 import dimage.searchpic.exception.auth.UnauthorizedMemberException;
@@ -18,13 +19,11 @@ import java.util.Date;
 public class JwtTokenProvider {
     private final TokenInfoProvider tokenKeyProvider;
 
-    // 액세스 토큰 생성
-    public String createAccessToken(String pk) { // 멤버의 pk를 claims 를 포함하는 페이로드에 담아서 이를 토큰으로 발급
-        return createToken(pk, tokenKeyProvider.getAccessTokenInfo().getValidTime(),tokenKeyProvider.getAccessTokenInfo().getSecretKey());
-    }
-    // 리프레시 토큰 생성
-    public String createRefreshToken(String pk) {
-        return createToken(pk, tokenKeyProvider.getRefreshTokenInfo().getValidTime() ,tokenKeyProvider.getRefreshTokenInfo().getSecretKey());
+    // 액세스 토큰과 리프레시 토큰 생성
+    public TokenResponse createAccessAndRefreshTokens(String pk) {
+        String accessToken = createToken(pk, tokenKeyProvider.getAccessTokenInfo().getValidTime(), tokenKeyProvider.getAccessTokenInfo().getSecretKey());
+        String refreshToken = createToken(pk, tokenKeyProvider.getRefreshTokenInfo().getValidTime(), tokenKeyProvider.getRefreshTokenInfo().getSecretKey());
+        return TokenResponse.of(accessToken, refreshToken);
     }
 
     private String createToken(String pk, long validTime, String secretKey) {
