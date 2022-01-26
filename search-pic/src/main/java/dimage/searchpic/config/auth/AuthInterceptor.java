@@ -1,7 +1,7 @@
 package dimage.searchpic.config.auth;
 
 import dimage.searchpic.exception.ErrorInfo;
-import dimage.searchpic.exception.auth.UnauthorizedMemberException;
+import dimage.searchpic.exception.auth.ExpiredTokenException;
 import dimage.searchpic.util.TokenExtractor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,6 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (!isExcludedCondition(request.getRequestURI(), request.getMethod())) {
-            log.info("토큰을 검증해야 합니다.");
             validateToken(request);
         }
         return true;
@@ -41,15 +40,15 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         boolean isIncludePath = includePaths.stream().anyMatch(
                 pathPattern -> pathMatcher.match(pathPattern, requestPath));
-
         return isGetMethod && isExcludedPath && !isIncludePath;
     }
 
+    // 요청의 헤더에 포함된 토큰 값의 유효성을 판단하고, 유효한 토큰이 아닐 경우 이에 해당하는 예외를 발생시킨다.
     private void validateToken(HttpServletRequest request) {
         String token = TokenExtractor.resolveToken(request);
-        boolean valid = jwtTokenProvider.validateToken(token);
+        boolean valid = jwtTokenProvider.isValidToken(token,"access");
 
-        if (!valid) // 토큰 만료된 경우
-            throw new UnauthorizedMemberException(ErrorInfo.NOT_AUTHORIZED_USER);
+        if (!valid) // 액세스 토큰 만료된 경우
+            throw new ExpiredTokenException(ErrorInfo.EXPIRED_TOKEN);
     }
 }

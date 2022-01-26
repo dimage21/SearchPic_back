@@ -11,12 +11,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class OauthService {
+public class OauthProvider {
     private final RestTemplate restTemplate;
     private final List<OauthInfo> oauthInfoList;
 
     public UserInfo getUserInfo(String accessToken, String provider) {
-        log.info("OauthService | getOauthInfo called");
         OauthInfo oauthInfo = getInfo(provider);
         return oauthInfo.getUserInfo(accessToken, restTemplate);
     }

@@ -1,0 +1,4 @@
+file:
+  upload-dir: 로컬에서_테스트시_유저가_올린_사진_저장할_경로
+ml:
+  server: http://localhost:8000

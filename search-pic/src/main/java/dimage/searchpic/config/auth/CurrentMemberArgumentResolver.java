@@ -25,9 +25,9 @@ public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResol
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String accessToken = TokenExtractor.resolveToken(request);
 
-        if (!jwtTokenProvider.validateToken(accessToken))
+        if (!jwtTokenProvider.isValidToken(accessToken,"access"))
             return Member.builder().id(null).build();
-        long pk = Long.parseLong(jwtTokenProvider.getPkFromAccessToken(accessToken));
+        long pk = Long.parseLong(jwtTokenProvider.getPkFromToken(accessToken,"access"));
         return Member.builder().id(pk).build();
     }
 }
