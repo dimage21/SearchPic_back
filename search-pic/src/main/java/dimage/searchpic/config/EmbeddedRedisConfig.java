@@ -15,15 +15,15 @@ import java.io.IOException;
 @Configuration
 public class EmbeddedRedisConfig {
 
-    @Value("${spring.redis.port}")
-    private int redisPort;
-
     private RedisServer redisServer;
 
     @PostConstruct
     public void redisServer() throws IOException {
-        redisServer = new RedisServer(redisPort);
-        redisServer.start();
+        try {
+            int redisPort = 6379;
+            redisServer = new RedisServer(redisPort);
+            redisServer.start();
+        } catch (Exception e) {}
     }
 
     @PreDestroy
