@@ -37,6 +37,6 @@ out/
 .vscode/
 
 .DS_Store
-**/application-local.yml
+**/main/resources/application-local.yml
 **/application-oauth.yml
 **/application-prod.yml
