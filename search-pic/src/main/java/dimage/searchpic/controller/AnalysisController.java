@@ -24,7 +24,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriComponentsBuilder;
 import springfox.documentation.annotations.ApiIgnore;
+
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,9 +47,15 @@ public class AnalysisController {
     })
     @PostMapping(value = "/analysis")
     public ResponseEntity<?> searchPlace(@RequestParam("image")  MultipartFile multipartFile,
-                                         @ApiIgnore @CurrentMember Member member) {
+                                         @ApiIgnore @CurrentMember Member member,
+                                         @RequestParam String type) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        URI requestUri = UriComponentsBuilder.fromHttpUrl(serverUrl + "/predict")
+                .queryParam("type",type)
+                .build()
+                .toUri();
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("image",multipartFile.getResource());
@@ -54,7 +63,7 @@ public class AnalysisController {
 
         try {
             result = restTemplate.postForEntity(
-                    serverUrl + "/predict",
+                    requestUri,
                     new HttpEntity<>(body, headers),
                     AnalysisResponse.class);
         } catch (Exception e){
