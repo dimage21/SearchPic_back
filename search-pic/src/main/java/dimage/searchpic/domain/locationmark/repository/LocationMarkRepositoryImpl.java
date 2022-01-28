@@ -21,6 +21,8 @@ public class LocationMarkRepositoryImpl implements LocationMarkRepositoryCustom{
                 .select(Projections.fields(MarkLocationResponse.class,
                         location.id.as("id"),
                         location.repImageUrl.as("imageUrl"),
+                        location.placeName.as("placeName"),
+                        location.address.as("address"),
                         location.x.as("x"),
                         location.y.as("y")
                 ))
