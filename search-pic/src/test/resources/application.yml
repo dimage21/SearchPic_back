@@ -1,21 +1,16 @@
 spring:
+  h2:
+    console:
+      enabled: true
   jpa:
-    hibernate:
-      ddl-auto: create-drop
     properties:
       hibernate:
+        format_sql: true
+        show_sql: true
         id:
           new_generator_mappings: false
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:tcp://localhost/~/test
-    username: sa
-    password:
-  redis:
-    host: localhost
-    port: 6379
   profiles:
     active: local
-
   security:
     oauth2:
       client:
@@ -42,8 +37,8 @@ cloud:
       bucket: 버킷_이름
     region:
       static: ap-northeast-2 # 리전 이름
-
-# WebMvc 테스트 한글 깨짐 방지
+    stack:
+      auto: false
 server:
   servlet:
     encoding:
