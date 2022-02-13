@@ -9,7 +9,6 @@ import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
 import dimage.searchpic.dto.location.MarkLocationResponse;
 import dimage.searchpic.service.LocationMarkService;
-import dimage.searchpic.service.LocationQueryService;
 import dimage.searchpic.service.LocationService;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +23,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LocationController {
     private final LocationService locationService;
-    private final LocationQueryService queryService;
     private final LocationMarkService locationMarkService;
 
     @ApiOperation(value = "장소 마크하기")
@@ -86,7 +84,7 @@ public class LocationController {
     @ApiOperation(value = "장소 위치 정보 확인")
     @GetMapping("/api/location")
     public ResponseEntity<?> checkLocation(@RequestParam double x, @RequestParam double y){
-        Location location = queryService.requestLocationInfo(x, y);
+        Location location = locationService.requestLocationInfo(x, y);
         StringBuilder sb = new StringBuilder();
         sb.append(location.getAddress()).append(" (").append(location.getDong()).append(")");
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,sb.toString()));
@@ -95,7 +93,7 @@ public class LocationController {
     @ApiOperation(value = "동네 이름으로 검색하여 가능한 동네 이름들과 위치 정보 확인")
     @GetMapping("/api/locations")
     public ResponseEntity<?> getPossibleDongsInfo(@RequestParam String query) {
-        List<LocationQueryResponse> response = queryService.requestQueryInfo(query);
+        List<LocationQueryResponse> response = locationService.requestQueryInfo(query);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
 }

@@ -7,11 +7,13 @@ import dimage.searchpic.domain.member.Member;
 import dimage.searchpic.domain.member.repository.MemberRepository;
 import dimage.searchpic.domain.post.repository.PostRepository;
 import dimage.searchpic.domain.tag.repository.TagRepository;
+import dimage.searchpic.dto.location.LocationQueryResponse;
 import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.location.MarkLocationResponse;
 import dimage.searchpic.dto.tag.TagResponse;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.common.NotFoundException;
+import dimage.searchpic.service.location.KakaoApiRequester;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ public class LocationService {
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final TagRepository tagRepository;
-    private final LocationQueryService queryService;
+    private final KakaoApiRequester apiRequester;
 
     public List<LocationResponse> findByNames(List<String> names, Long memberId) {
         List<Location> locations = locationRepository.findLocations(names,
@@ -55,13 +57,14 @@ public class LocationService {
         return locationRepository.findByXAndY(x, y)
                 .orElseGet(
                         () -> {
-                            Location location = queryService.requestLocationInfo(x, y);
+                            Location location = requestLocationInfo(x, y);
                             location.setRepImageUrl(repUrl);
                             locationRepository.save(location);
                             return location;
                         }
                 );
     }
+
     public List<MarkLocationResponse> findAllLocations(){
         return locationRepository.findAll().stream().map(MarkLocationResponse::of).collect(Collectors.toList());
     }
@@ -69,6 +72,7 @@ public class LocationService {
     public List<MarkLocationResponse> findLocationsMemberMarked(Long memberId){
         return locationMarkRepository.findLocationsMemberMarked(memberId);
     }
+
     public List<MarkLocationResponse> findLocationsMemberWrite(Long memberId){
         return postRepository.findLocationsMemberWrite(memberId);
     }
@@ -84,5 +88,15 @@ public class LocationService {
             return LocationResponse.of(location, topTagNames,member.checkAlreadyMarked(location),x,y);
         })
         .collect(Collectors.toList());
+    }
+
+    // 특정 위/경도 위치의 장소 관련 정보 조회
+    public Location requestLocationInfo(double x, double y) {
+        return apiRequester.requestLocationInfo(x, y);
+    }
+
+    // 특정 검색어를 통해 가능한 동네 정보 조회
+    public List<LocationQueryResponse> requestQueryInfo(String query) {
+        return apiRequester.requestQueryInfo(query);
     }
 }
