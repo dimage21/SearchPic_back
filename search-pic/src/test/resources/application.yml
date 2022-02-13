@@ -27,6 +27,7 @@ jwt:
 location:
   key: 카카오_secret_key
   coord-url: https://dapi.kakao.com/v2/local/geo/coord2address
+  query-url: https://dapi.kakao.com/v2/local/search/address
 
 cloud:
   aws:
