@@ -3,6 +3,7 @@ package dimage.searchpic.controller;
 import dimage.searchpic.config.auth.CurrentMember;
 import dimage.searchpic.domain.location.Location;
 import dimage.searchpic.domain.member.Member;
+import dimage.searchpic.dto.location.LocationQueryResponse;
 import dimage.searchpic.dto.location.LocationResponse;
 import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
@@ -23,15 +24,6 @@ import java.util.Optional;
 public class LocationController {
     private final LocationService locationService;
     private final LocationMarkService locationMarkService;
-
-    @ApiOperation(value = "장소 위치 정보 확인")
-    @GetMapping("/location")
-    public ResponseEntity<?> checkLocation(@RequestParam double x, @RequestParam double y){
-        Location location = locationService.requestLocationInfo(x, y);
-        StringBuilder sb = new StringBuilder();
-        sb.append(location.getAddress()).append(" (").append(location.getDong()).append(")");
-        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,sb.toString()));
-    }
 
     @ApiOperation(value = "장소 마크하기")
     @PostMapping("/location/{id}/mark")
@@ -86,5 +78,22 @@ public class LocationController {
         double distance = distanceKm.orElse(1.0);
         List<LocationResponse> response = locationService.nearSpotsInfo(member.getId(),x, y,distance);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,response));
+    }
+
+    // 카카오에 api 요청
+    @ApiOperation(value = "장소 위치 정보 확인")
+    @GetMapping("/api/location")
+    public ResponseEntity<?> checkLocation(@RequestParam double x, @RequestParam double y){
+        Location location = locationService.requestLocationInfo(x, y);
+        StringBuilder sb = new StringBuilder();
+        sb.append(location.getAddress()).append(" (").append(location.getDong()).append(")");
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS,sb.toString()));
+    }
+
+    @ApiOperation(value = "동네 이름으로 검색하여 가능한 동네 이름들과 위치 정보 확인")
+    @GetMapping("/api/locations")
+    public ResponseEntity<?> getPossibleDongsInfo(@RequestParam String query) {
+        List<LocationQueryResponse> response = locationService.requestQueryInfo(query);
+        return ResponseEntity.ok(CommonResponse.of(CommonInfo.SUCCESS, response));
     }
 }

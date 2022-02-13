@@ -20,7 +20,7 @@ public class AuthInterceptor implements HandlerInterceptor {
     private final JwtTokenProvider jwtTokenProvider;
     private final PathMatcher pathMatcher = new AntPathMatcher();
     private final List<String> excludePaths = Arrays.asList("/login/**", "/locations/filter", "/posts/search/**",
-                                                            "/tags", "/**/posts/**", "/location");
+                                                            "/tags", "/**/posts/**", "/location","/api/**");
     private final List<String> includePaths = Arrays.asList("/posts/member/**");
 
     @Override

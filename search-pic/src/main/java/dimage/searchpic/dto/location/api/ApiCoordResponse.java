@@ -1,27 +1,21 @@
-package dimage.searchpic.dto.location;
+package dimage.searchpic.dto.location.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import dimage.searchpic.domain.location.Location;
 import lombok.Getter;
-import java.util.List;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class CoordResponse {
-    private CoordResponse(){}
-    public CoordResponse(List<Document> documents) {
-        this.documents = documents;
-    }
-
-    private List<Document> documents;
+@NoArgsConstructor
+public class ApiCoordResponse extends KakaoApiResponse<ApiCoordResponse.CoordDocument> {
 
     @Getter
-    private static class Document {
+    public static class CoordDocument extends Document {
         @JsonProperty("road_address")
         RoadAddress roadAddress;
         Address address;
 
         @Getter
-        private static class RoadAddress {
+        public static class RoadAddress {
             public RoadAddress(){}
             public RoadAddress(String roadAddress) {
                 this.roadAddress = roadAddress;
@@ -31,7 +25,7 @@ public class CoordResponse {
         }
 
         @Getter
-        private static class Address {
+        public static class Address {
             public Address(){}
             public Address(String address, String si, String gu, String dong) {
                 this.address = address;
@@ -49,21 +43,5 @@ public class CoordResponse {
             @JsonProperty("region_3depth_name")
             String dong;
         }
-
-    }
-
-    public Location createLocation(double x,double y) {
-        Document.RoadAddress roadAddress = this.documents.get(0).getRoadAddress();
-        Document.Address address = this.documents.get(0).getAddress();
-        return Location.builder()
-                .address(roadAddress != null ?
-                        roadAddress.getRoadAddress() :
-                        address.getAddress())
-                .gu(address.getGu())
-                .si(address.getSi())
-                .x(x)
-                .y(y)
-                .dong(address.getDong())
-                .build();
     }
 }
