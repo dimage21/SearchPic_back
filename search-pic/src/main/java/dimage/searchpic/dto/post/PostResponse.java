@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @ApiModel("하나의 게시글 응답")
 public class PostResponse {
     @ApiModelProperty("게시글 id")
-    long postId;
+    long id;
 
     @ApiModelProperty("사진 url")
     String pictureUrl;
@@ -43,7 +43,7 @@ public class PostResponse {
     }
 
     public PostResponse(long postId, String pictureUrl, String address, String description, long locationId) {
-        this.postId = postId;
+        this.id = postId;
         this.pictureUrl = pictureUrl;
         this.address = address;
         this.description = description;

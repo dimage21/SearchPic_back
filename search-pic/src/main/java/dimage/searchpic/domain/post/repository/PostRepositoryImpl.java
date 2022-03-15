@@ -26,7 +26,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     public List<PostResponse> getFilteredPosts(List<String> tagNames, long offset, int size, SearchOrder order) {
         JPAQuery<PostResponse> postJPAQuery = queryFactory
                 .select(Projections.constructor(PostResponse.class,
-                        post.id.as("postId"),
+                        post.id.as("id"),
                         post.pictureUrl,
                         location.address,
                         post.description,
@@ -74,14 +74,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private List<Long> getPostIds(List<PostResponse> postResponses) {
         return postResponses.stream()
-                .map(PostResponse::getPostId)
+                .map(PostResponse::getId)
                 .collect(Collectors.toList());
     }
 
     private void insertTagNamesPerPost(List<PostResponse> postResponses, Map<Long, List<PostTagDto>> postTagsMap) {
         postResponses.forEach(p -> {
-            if (postTagsMap.containsKey(p.getPostId())){
-                List<String> tagNames = postTagsMap.get(p.getPostId())
+            if (postTagsMap.containsKey(p.getId())){
+                List<String> tagNames = postTagsMap.get(p.getId())
                         .stream()
                         .map(PostTagDto::getTagName)
                         .collect(Collectors.toList());
