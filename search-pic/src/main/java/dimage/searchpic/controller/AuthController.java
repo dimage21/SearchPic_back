@@ -1,11 +1,11 @@
 package dimage.searchpic.controller;
 
+import dimage.searchpic.dto.auth.LoginInfoRequest;
 import dimage.searchpic.dto.auth.TokenResponse;
 import dimage.searchpic.dto.common.CommonInfo;
 import dimage.searchpic.dto.common.CommonResponse;
 import dimage.searchpic.service.auth.AuthService;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +25,9 @@ public class AuthController {
     @ApiResponses({
             @ApiResponse(code = 200, response = TokenResponse.class,message = "서버에서 생성한 액세스 토큰과 리프레시 토큰을 리턴한다.")
     })
-    @GetMapping(value = "/login/{provider}")
-    public ResponseEntity<?> getTokenFromClient(@ApiParam(value = "소셜사에게 받은 액세스 토큰" ,required = true) @RequestParam(value = "token") String token,
-                                                @ApiParam(value = "소셜사 이름",required = true) @PathVariable String provider) {
-        TokenResponse response = authService.loginOrSignUpAndCreateTokens(token, provider);
+    @PostMapping(value = "/login")
+    public ResponseEntity<CommonResponse<TokenResponse>> login(@RequestBody LoginInfoRequest loginInfo) {
+        TokenResponse response = authService.loginOrSignUpAndCreateTokens(loginInfo);
         return ResponseEntity.ok(CommonResponse.of(CommonInfo.LOGIN_SUCCESS,response));
     }
 
