@@ -5,6 +5,7 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import dimage.searchpic.exception.ErrorInfo;
 import dimage.searchpic.exception.storage.FileStorageException;
@@ -50,9 +51,11 @@ public class S3Storage implements FileStorage {
     @Override
     public String storeFile(MultipartFile file, Long userId)  {
         String storeFileName = createStoreFileName(Objects.requireNonNull(file.getOriginalFilename()),userId);
+        ObjectMetadata metaData = new ObjectMetadata();
+        metaData.setContentLength(file.getSize());
         try {
             s3Client.putObject(
-                    new PutObjectRequest(bucket, storeFileName, file.getInputStream(), null)
+                    new PutObjectRequest(bucket, storeFileName, file.getInputStream(), metaData)
                      .withCannedAcl(CannedAccessControlList.PublicRead)
             );
             return s3Client.getUrl(bucket, storeFileName).toString();
