@@ -110,7 +110,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private List<PostResponse> getPostResponses(Long memberId, long offset, int size){
         return queryFactory
                 .select(Projections.constructor(PostResponse.class,
-                        post.id.as("postId"),
+                        post.id.as("id"),
                         post.pictureUrl,
                         location.address,
                         post.description,
