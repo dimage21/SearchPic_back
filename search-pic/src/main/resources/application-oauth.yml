@@ -1,0 +1,44 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client_id: CLIENT_ID
+            client-secret: CLEINT_SECRET
+            redirect-uri-path: /login/oauth2/code/kakao
+            authorization-grant-type: authorization_code
+            url:
+              token: https://kauth.kakao.com/oauth/token
+              info: https://kapi.kakao.com/v2/user/me
+          naver:
+            client_id: CLIENT_ID
+            client-secret: CLIENT_SECRET
+            redirect-uri-path: /login/oauth2/code/naver
+            authorization-grant-type: authorization_code
+            url:
+              token: https://nid.naver.com/oauth2.0/token
+              info: https://openapi.naver.com/v1/nid/me
+
+jwt:
+  access-secret: access-secret
+  refresh-secret: refresh-secret
+  access-expire-time: 1_800_000 # 60분 60*1000*30 : 1_800_000
+  refresh-expire-time: 604_800_000 # 1주 60*1000*60*24*7
+
+location:
+  key: KakaoAK KEY
+  coord-url: https://dapi.kakao.com/v2/local/geo/coord2address
+  query-url: https://dapi.kakao.com/v2/local/search/address
+
+cloud:
+  aws:
+    credentials:
+      access-key: ACCESS_KEY
+      secret-key: SECERET_KEY
+    s3:
+      bucket: BUCKET_NAME
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
