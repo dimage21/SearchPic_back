@@ -38,5 +38,3 @@ out/
 
 .DS_Store
 **/main/resources/application-local.yml
-**/application-oauth.yml
-**/application-prod.yml

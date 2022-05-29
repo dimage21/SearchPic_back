@@ -1,0 +1,23 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.MariaDBDialect
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://localhost:3306/searchPic?allowPublicKeyRetrieval=true&useSSL=false&autoReconnect=true
+    username: sample
+    password: '1004'
+
+  redis:
+    host: localhost
+    port: 6379
+
+file:
+  upload-dir: 로컬에서 테스트할 때 사진 올릴 폴더 경로
+
+ml:
+  server: http://localhost:8000
+
+base:
+  url: http://localhost:8080

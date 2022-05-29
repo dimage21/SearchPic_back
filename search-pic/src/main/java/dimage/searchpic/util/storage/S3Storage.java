@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
-@Profile("prod")
+@Profile("!local")
 @Component
 public class S3Storage implements FileStorage {
     private AmazonS3 s3Client;
